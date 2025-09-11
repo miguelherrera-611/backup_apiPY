@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil - GAMERLY{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<!-- Header del Perfil -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="text-white">
+            <i class="fas fa-user-circle me-3"></i>
+            Mi Perfil
+        </h1>
+        <p class="text-white-50 mb-0">Gestiona tu información personal y preferencias</p>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card card p-3 text-center">
+            <h4 class="mb-1">Cliente</h4>
+            <small>Miembro desde {{ user.date_joined|date:"M Y" }}</small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Información Personal -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    Información Personal
+                </h5>
+                <button class="btn btn-primary btn-sm" onclick="toggleEditMode()">
+                    <i class="fas fa-edit me-1"></i>
+                    <span id="editButtonText">Editar</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <form id="perfilForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                   value="{{ user.first_name }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                   value="{{ user.last_name }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   value="{{ user.username }}" readonly>
+                            <small class="text-muted">El nombre de usuario no se puede cambiar</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ user.email }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                   value="{{ perfil.telefono|default:'' }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" 
+                                   value="{{ perfil.fecha_nacimiento|date:'Y-m-d'|default:'' }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="direccion" name="direccion" rows="3" readonly>{{ perfil.direccion|default:'' }}</textarea>
+                    </div>
+
+                    <div class="d-none" id="saveButtons">
+                        <button type="button" class="btn btn-success me-2" onclick="guardarPerfil()">
+                            <i class="fas fa-save me-1"></i>Guardar Cambios
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Cambiar Contraseña -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lock me-2"></i>
+                    Cambiar Contraseña
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="passwordForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Contraseña Actual</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('current_password', 'currentIcon')">
+                                <i class="fas fa-eye" id="currentIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="new_password1" class="form-label">Nueva Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('new_password1', 'newIcon1')">
+                                <i class="fas fa-eye" id="newIcon1"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Mínimo 8 caracteres con letras y números</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="new_password2" class="form-label">Confirmar Nueva Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('new_password2', 'newIcon2')">
+                                <i class="fas fa-eye" id="newIcon2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-warning" onclick="cambiarPassword()">
+                        <i class="fas fa-key me-1"></i>Cambiar Contraseña
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Lateral -->
+    <div class="col-lg-4">
+        <!-- Estadísticas del Usuario -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Mis Estadísticas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <h4 class="text-primary">{{ carrito.total_items }}</h4>
+                        <small>Items en Carrito</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h4 class="text-success">${{ carrito.total_precio }}</h4>
+                        <small>Total en Carrito</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <p class="mb-0"><strong>Miembro desde:</strong></p>
+                    <p class="text-muted">{{ user.date_joined|date:"d M Y" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Acciones Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ver_carrito' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Ver Mi Carrito
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-info">
+                        <i class="fas fa-store me-2"></i>
+                        Explorar Productos
+                    </a>
+                    <button class="btn btn-outline-danger" onclick="confirmarCerrarSesion()">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de la Cuenta -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información de la Cuenta
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <strong>Estado:</strong> 
+                        <span class="badge bg-success">Activa</span>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Tipo:</strong> Cliente
+                    </li>
+                    <li class="mb-2">
+                        <strong>Última conexión:</strong><br>
+                        <small class="text-muted">{{ user.last_login|date:"d M Y H:i" }}</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let editMode = false;
+let originalValues = {};
+
+function toggleEditMode() {
+    editMode = !editMode;
+    const inputs = document.querySelectorAll('#perfilForm input[readonly], #perfilForm textarea[readonly]');
+    const editButton = document.getElementById('editButtonText');
+    const saveButtons = document.getElementById('saveButtons');
+    
+    if (editMode) {
+        // Guardar valores originales
+        inputs.forEach(input => {
+            if (input.id !== 'username') { // El username no se puede editar
+                originalValues[input.id] = input.value;
+                input.removeAttribute('readonly');
+            }
+        });
+        editButton.textContent = 'Cancelar';
+        saveButtons.classList.remove('d-none');
+    } else {
+        // Cancelar edición
+        cancelarEdicion();
+    }
+}
+
+function cancelarEdicion() {
+    editMode = false;
+    const inputs = document.querySelectorAll('#perfilForm input, #perfilForm textarea');
+    const editButton = document.getElementById('editButtonText');
+    const saveButtons = document.getElementById('saveButtons');
+    
+    // Restaurar valores originales
+    inputs.forEach(input => {
+        if (input.id !== 'username') {
+            input.setAttribute('readonly', true);
+            if (originalValues[input.id] !== undefined) {
+                input.value = originalValues[input.id];
+            }
+        }
+    });
+    
+    editButton.textContent = 'Editar';
+    saveButtons.classList.add('d-none');
+    originalValues = {};
+}
+
+function guardarPerfil() {
+    const formData = new FormData(document.getElementById('perfilForm'));
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch('/ajax/actualizar-perfil/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarMensaje(data.message, 'success');
+            toggleEditMode(); // Salir del modo edición
+        } else {
+            mostrarMensaje(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarMensaje('Error al actualizar perfil', 'error');
+    });
+}
+
+function cambiarPassword() {
+    const formData = new FormData(document.getElementById('passwordForm'));
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // Validar que las contraseñas coincidan
+    const newPassword1 = formData.get('new_password1');
+    const newPassword2 = formData.get('new_password2');
+    
+    if (newPassword1 !== newPassword2) {
+        mostrarMensaje('Las nuevas contraseñas no coinciden', 'error');
+        return;
+    }
+    
+    fetch('/ajax/cambiar-password/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarMensaje(data.message, 'success');
+            document.getElementById('passwordForm').reset();
+        } else {
+            mostrarMensaje(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarMensaje('Error al cambiar contraseña', 'error');
+    });
+}
+
+function togglePasswordVisibility(inputId, iconId) {
+    const passwordInput = document.getElementById(inputId);
+    const toggleIcon = document.getElementById(iconId);
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+function confirmarCerrarSesion() {
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        window.location.href = '{% url "logout" %}';
+    }
+}
+
+function mostrarMensaje(mensaje, tipo) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-info-circle me-2"></i>
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    const main = document.querySelector('main .container');
+    main.insertBefore(alertDiv, main.firstChild);
+
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

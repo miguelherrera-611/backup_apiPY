@@ -1,0 +1,151 @@
+{% load i18n %}
+
+<nav class="sticky" id="nav-sidebar" style="background: linear-gradient(180deg, #1a1a1a, #2a2a2a); border-right: 2px solid #8b5cf6; box-shadow: 4px 0 20px rgba(139, 92, 246, 0.3); width: 280px; min-height: 100vh; padding: 20px 0;">
+
+    <!-- Gaming Stats Section -->
+    <div style="padding: 20px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(26, 26, 26, 0.8)); border: 1px solid #8b5cf6; border-radius: 12px; margin: 10px;">
+        <h3 style="color: #c084fc; font-family: 'Orbitron', monospace; font-size: 14px; margin-bottom: 15px; text-align: center;">
+            🎮 GAMERLY ADMIN
+        </h3>
+        <div style="text-align: center; color: #ffffff; font-size: 12px;">
+            <div style="margin: 5px 0;">⚡ Sistema Online</div>
+            <div style="margin: 5px 0;">🔒 Modo Seguro</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="module" style="background: rgba(26, 26, 26, 0.9); border: 2px solid #8b5cf6; border-radius: 12px; margin: 10px; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);">
+        <h2 style="background: linear-gradient(45deg, #8b5cf6, #a855f7); color: white; font-family: 'Orbitron', monospace; font-weight: 700; text-transform: uppercase; padding: 15px; margin: 0; text-shadow: 0 0 10px rgba(0,0,0,0.5); font-size: 14px;">
+            ⚡ Acciones Rápidas
+        </h2>
+        <div style="padding: 15px;">
+            <a href="{% url 'admin:productos_producto_add' %}"
+               style="display: block; color: #ffffff; text-decoration: none; padding: 10px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; margin-bottom: 8px; font-size: 13px;">
+                <strong>📦 Nuevo Producto</strong>
+            </a>
+            <a href="{% url 'admin:productos_categoria_add' %}"
+               style="display: block; color: #ffffff; text-decoration: none; padding: 10px; background: rgba(139, 92, 246, 0.2); border: 1px solid #8b5cf6; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; margin-bottom: 8px; font-size: 13px;">
+                <strong>🏷️ Nueva Categoría</strong>
+            </a>
+            <a href="{% url 'home' %}"
+               style="display: block; color: #ffffff; text-decoration: none; padding: 10px; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; font-size: 13px;">
+                <strong>🌐 Ver Sitio Web</strong>
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation Modules -->
+    {% if available_apps %}
+        {% for app in available_apps %}
+            <div class="module" style="background: rgba(26, 26, 26, 0.9); border: 2px solid #8b5cf6; border-radius: 12px; margin: 10px; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);">
+                <h2 style="background: linear-gradient(45deg, #8b5cf6, #a855f7); color: white; font-family: 'Orbitron', monospace; font-weight: 700; text-transform: uppercase; padding: 15px; margin: 0; text-shadow: 0 0 10px rgba(0,0,0,0.5); font-size: 14px;">
+                    {% if app.name == "Productos" %}🎮
+                    {% elif app.name == "Authentication and Authorization" %}👤
+                    {% elif app.name == "Auth" %}👤
+                    {% else %}⚙️{% endif %}
+                    {{ app.verbose_name|default:app.name }}
+                </h2>
+                <div style="padding: 15px;">
+                    {% for model in app.models %}
+                        <div style="margin-bottom: 8px;">
+                            <a href="{{ model.admin_url }}"
+                               style="display: block; color: #ffffff; text-decoration: none; padding: 8px 12px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; transition: all 0.3s ease; font-weight: 500; font-size: 13px;">
+                                {% if model.name == "Productos" %}📦
+                                {% elif model.name == "Categorias" or model.name == "Categorías" %}🏷️
+                                {% elif model.name == "Users" or model.name == "Usuarios" %}👥
+                                {% elif model.name == "Perfil usuarios" %}👤
+                                {% elif model.name == "Carritos" %}🛒
+                                {% elif model.name == "Item carritos" %}📋
+                                {% elif model.name == "Groups" or model.name == "Grupos" %}👥
+                                {% else %}📄{% endif %}
+                                <strong>{{ model.name }}</strong>
+                                {% if model.add_url %}
+                                    <div style="font-size: 11px; color: #c084fc; margin-top: 3px;">
+                                        <a href="{{ model.add_url }}" style="color: #10b981; text-decoration: none;">
+                                            ➕ Agregar
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- System Status -->
+    <div style="padding: 15px; margin: 10px; background: rgba(26, 26, 26, 0.6); border: 1px solid rgba(139, 92, 246, 0.5); border-radius: 8px; text-align: center;">
+        <div style="color: #c084fc; font-size: 11px; margin-bottom: 5px;">Estado del Sistema</div>
+        <div style="color: #10b981; font-size: 10px;">✅ Online</div>
+        <div style="color: #8b5cf6; font-size: 10px;">🔒 Seguro</div>
+        <div style="color: #f59e0b; font-size: 10px;">⚡ Gaming Mode</div>
+    </div>
+
+</nav>
+
+<style>
+    /* Hover effects for sidebar links */
+    #nav-sidebar a:hover {
+        background: rgba(139, 92, 246, 0.3) !important;
+        transform: translateX(5px) !important;
+        border-color: #c084fc !important;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.4) !important;
+    }
+
+    /* Module hover effects */
+    #nav-sidebar .module:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3) !important;
+    }
+
+    /* Smooth transitions */
+    #nav-sidebar * {
+        transition: all 0.3s ease !important;
+    }
+
+    /* Gaming scrollbar for sidebar */
+    #nav-sidebar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #nav-sidebar::-webkit-scrollbar-track {
+        background: rgba(26, 26, 26, 0.5);
+        border-radius: 4px;
+    }
+
+    #nav-sidebar::-webkit-scrollbar-thumb {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        border-radius: 4px;
+    }
+
+    #nav-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #c084fc;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        #nav-sidebar {
+            width: 100% !important;
+            position: relative !important;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add gaming effects to sidebar
+    const sidebarLinks = document.querySelectorAll('#nav-sidebar a');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            this.style.textShadow = '0 0 10px #c084fc';
+        });
+        link.addEventListener('mouseleave', function() {
+            this.style.textShadow = 'none';
+        });
+    });
+
+    // Console message
+    console.log('🎮 GAMERLY Sidebar Loaded!');
+});
+</script>

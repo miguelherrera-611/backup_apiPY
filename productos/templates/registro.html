@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Cuenta - GAMERLY{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-plus fa-4x text-primary mb-3"></i>
+                    <h2 class="fw-bold">Crear Cuenta</h2>
+                    <p class="text-muted">Únete a la comunidad GAMERLY</p>
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label fw-bold">
+                                <i class="fas fa-user me-2"></i>Nombre
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="first_name"
+                                name="first_name"
+                                placeholder="Tu nombre"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                Por favor ingresa tu nombre.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label fw-bold">
+                                <i class="fas fa-user me-2"></i>Apellido
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="last_name"
+                                name="last_name"
+                                placeholder="Tu apellido"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                Por favor ingresa tu apellido.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-bold">
+                            <i class="fas fa-at me-2"></i>Usuario
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="username"
+                            name="username"
+                            placeholder="Nombre de usuario único"
+                            required
+                            autocomplete="username"
+                        >
+                        <div class="invalid-feedback">
+                            Por favor elige un nombre de usuario.
+                        </div>
+                        <small class="text-muted">Este será tu identificador único en GAMERLY</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-bold">
+                            <i class="fas fa-envelope me-2"></i>Email
+                        </label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            placeholder="tu@email.com"
+                            required
+                            autocomplete="email"
+                        >
+                        <div class="invalid-feedback">
+                            Por favor ingresa un email válido.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password1" class="form-label fw-bold">
+                            <i class="fas fa-lock me-2"></i>Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="password1"
+                                name="password1"
+                                placeholder="Crea una contraseña segura"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <button
+                                class="btn btn-outline-secondary"
+                                type="button"
+                                onclick="togglePassword('password1', 'togglePassword1Icon')"
+                            >
+                                <i class="fas fa-eye" id="togglePassword1Icon"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor crea una contraseña segura.
+                        </div>
+                        <small class="text-muted">Mínimo 8 caracteres, incluye números y letras</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password2" class="form-label fw-bold">
+                            <i class="fas fa-lock me-2"></i>Confirmar Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="password2"
+                                name="password2"
+                                placeholder="Repite tu contraseña"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <button
+                                class="btn btn-outline-secondary"
+                                type="button"
+                                onclick="togglePassword('password2', 'togglePassword2Icon')"
+                            >
+                                <i class="fas fa-eye" id="togglePassword2Icon"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Las contraseñas deben coincidir.
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            Acepto los 
+                            <a href="#" class="text-primary">términos y condiciones</a> 
+                            de GAMERLY
+                        </label>
+                        <div class="invalid-feedback">
+                            Debes aceptar los términos y condiciones.
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Crear Mi Cuenta
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center">
+                    <p class="mb-0">¿Ya tienes cuenta?</p>
+                    <a href="{% url 'login' %}" class="btn btn-link text-decoration-none">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Beneficios de registrarse -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="text-center mb-4">
+                    <i class="fas fa-star me-2"></i>
+                    ¿Por qué crear una cuenta en GAMERLY?
+                </h4>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="fas fa-shopping-cart fa-3x text-primary mb-3"></i>
+                        <h5>Carrito Personalizado</h5>
+                        <p class="text-muted">Guarda tus productos favoritos y compra cuando quieras</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                        <h5>Lista de Deseos</h5>
+                        <p class="text-muted">Marca productos que te interesan para el futuro</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <i class="fas fa-bolt fa-3x text-warning mb-3"></i>
+                        <h5>Compras Rápidas</h5>
+                        <p class="text-muted">Proceso de compra más rápido con tu información guardada</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                // Validar que las contraseñas coincidan
+                const password1 = document.getElementById('password1').value;
+                const password2 = document.getElementById('password2').value;
+                
+                if (password1 !== password2) {
+                    document.getElementById('password2').setCustomValidity('Las contraseñas no coinciden');
+                } else {
+                    document.getElementById('password2').setCustomValidity('');
+                }
+
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Mostrar/ocultar contraseña
+function togglePassword(inputId, iconId) {
+    const passwordInput = document.getElementById(inputId);
+    const toggleIcon = document.getElementById(iconId);
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+// Validación en tiempo real de contraseñas
+document.getElementById('password2').addEventListener('input', function() {
+    const password1 = document.getElementById('password1').value;
+    const password2 = this.value;
+    
+    if (password1 !== password2) {
+        this.setCustomValidity('Las contraseñas no coinciden');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+
+// Auto-focus en el primer campo
+document.getElementById('first_name').focus();
+</script>
+{% endblock %}

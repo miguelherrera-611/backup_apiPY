@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo - Mi Tienda{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<!-- Header del Dashboard Cliente -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="text-white">
+            <i class="fas fa-shopping-bag me-3"></i>
+            Catálogo de Productos
+        </h1>
+        <p class="text-white-50 mb-0">Descubre nuestros increíbles productos</p>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card card p-3 text-center">
+            <h4 class="mb-1">{{ productos.paginator.count }}</h4>
+            <small>Productos Disponibles</small>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h5 class="mb-3">
+                    <i class="fas fa-filter me-2"></i>Filtrar Productos
+                </h5>
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="categoria" class="form-label">Categoría</label>
+                        <select name="categoria" id="categoria" class="form-control" onchange="this.form.submit()">
+                            <option value="">Todas las categorías</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria.id }}">
+                                    {{ categoria.nombre }} ({{ categoria.productos.count }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="btn-group">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Limpiar Filtros
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Filtrar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <a href="{% url 'ver_carrito' %}" class="btn btn-outline-info">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Ver Mi Carrito
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grid de Productos -->
+{% if productos %}
+    <div class="row">
+        {% for producto in productos %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card product-card h-100">
+                    <!-- Imagen del producto -->
+                    <div class="position-relative">
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" class="card-img-top product-image" alt="{{ producto.nombre }}">
+                        {% else %}
+                            <div class="product-image bg-gradient d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image fa-4x text-white-50"></i>
+                            </div>
+                        {% endif %}
+
+                        <!-- Badges superiores -->
+                        <div class="position-absolute top-0 start-0 p-2">
+                            {% if producto.destacado %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-star me-1"></i>Destacado
+                                </span>
+                            {% endif %}
+                            {% if producto.descuento_porcentaje > 0 %}
+                                <span class="badge bg-danger ms-1">
+                                    -{{ producto.descuento_porcentaje }}%
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Estado del stock -->
+                        <div class="position-absolute top-0 end-0 p-2">
+                            {% if producto.en_stock %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Disponible
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times me-1"></i>Agotado
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Contenido de la carta -->
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">{{ producto.nombre }}</h5>
+                            <span class="badge bg-info">{{ producto.categoria.nombre }}</span>
+                        </div>
+
+                        <p class="card-text text-muted flex-grow-1">
+                            {{ producto.descripcion|truncatewords:12 }}
+                        </p>
+
+                        <!-- Precio -->
+                        <div class="mb-3">
+                            {% if producto.precio_oferta %}
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted text-decoration-line-through me-2">
+                                        ${{ producto.precio }}
+                                    </span>
+                                    <span class="h4 text-success mb-0 me-2">
+                                        ${{ producto.precio_oferta }}
+                                    </span>
+                                    <span class="badge bg-success">
+                                        Oferta
+                                    </span>
+                                </div>
+                            {% else %}
+                                <span class="h4 text-primary mb-0">
+                                    ${{ producto.precio }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-boxes me-1"></i>
+                                    Stock: {{ producto.stock }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ producto.fecha_creacion|date:"d/m/Y" }}
+                                </small>
+                            </div>
+
+                            <!-- CARRITO CON CANTIDAD -->
+                            {% if producto.en_stock %}
+                                <div class="mb-2">
+                                    <label class="form-label mb-1">Cantidad:</label>
+                                    <select class="form-control form-control-sm mb-2" id="qty{{ producto.id }}">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-success w-100" onclick="agregarAlCarrito({{ producto.id }})">
+                                    <i class="fas fa-cart-plus me-2"></i>
+                                    Agregar al Carrito
+                                </button>
+                            {% else %}
+                                <button class="btn btn-secondary w-100" disabled>
+                                    <i class="fas fa-times me-2"></i>
+                                    Producto Agotado
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if productos.has_other_pages %}
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Paginación de productos">
+                <ul class="pagination pagination-lg">
+                    {% if productos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ productos.previous_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in productos.paginator.page_range %}
+                        {% if productos.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if productos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ productos.next_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+
+{% else %}
+    <!-- Estado vacío -->
+    <div class="text-center py-5">
+        <div class="card p-5">
+            <i class="fas fa-search fa-4x text-muted mb-4"></i>
+            <h3 class="text-muted">No se encontraron productos</h3>
+            {% if categoria_seleccionada %}
+                <p class="text-muted mb-4">
+                    No hay productos disponibles en la categoría seleccionada.
+                </p>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Ver todos los productos
+                </a>
+            {% else %}
+                <p class="text-muted">
+                    Aún no hay productos disponibles en la tienda.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Información de GAMERLY -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="text-primary mb-3">
+                            <i class="fas fa-gamepad me-3"></i>
+                            <strong>GAMERLY</strong>
+                        </h2>
+                        <h4 class="text-info mb-4" style="font-style: italic;">
+                            "Juega mejor. Vive Gamerly"
+                        </h4>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <i class="fas fa-envelope text-primary me-2 fa-lg"></i>
+                            <a href="mailto:gamerly_0131@gmail.com" class="text-decoration-none h5 mb-0">
+                                gamerly_0131@gmail.com
+                            </a>
+                        </div>
+                        <hr class="my-4">
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-heart text-danger me-2"></i>
+                            Gracias por elegirnos para tu experiencia gaming
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function agregarAlCarrito(productoId) {
+    var cantidad = document.getElementById('qty' + productoId).value;
+    var boton = event.target;
+    var textoOriginal = boton.innerHTML;
+
+    boton.disabled = true;
+    boton.innerHTML = 'Agregando...';
+
+    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('/ajax/carrito/agregar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            producto_id: productoId,
+            cantidad: parseInt(cantidad)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            document.getElementById('qty' + productoId).selectedIndex = 0;
+
+            // Actualizar contador del carrito
+            var badge = document.getElementById('carritoBadge');
+            if (badge) {
+                badge.textContent = data.carrito_items;
+            }
+        } else {
+            alert('Error: ' + data.message);
+        }
+        boton.disabled = false;
+        boton.innerHTML = textoOriginal;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al agregar producto al carrito');
+        boton.disabled = false;
+        boton.innerHTML = textoOriginal;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var cards = document.querySelectorAll('.product-card');
+    for (var i = 0; i < cards.length; i++) {
+        cards[i].addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px)';
+        });
+        cards[i].addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    }
+});
+</script>
+{% endblock %}

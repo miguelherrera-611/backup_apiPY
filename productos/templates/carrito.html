@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Carrito - Mi Tienda{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<!-- Header del Carrito -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="text-white">
+            <i class="fas fa-shopping-cart me-3"></i>
+            Mi Carrito de Compras
+        </h1>
+        <p class="text-white-50 mb-0">Revisa y gestiona tus productos seleccionados</p>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card card p-3 text-center">
+            <h4 class="mb-1" id="totalItemsHeader">{{ carrito.total_items }}</h4>
+            <small>Items en el Carrito</small>
+        </div>
+    </div>
+</div>
+
+{% if items %}
+    <div class="row">
+        <!-- Lista de productos en el carrito -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Productos en tu Carrito
+                    </h5>
+                    <button class="btn btn-outline-danger btn-sm" onclick="limpiarTodoCarrito()">
+                        <i class="fas fa-trash me-1"></i>Limpiar Todo
+                    </button>
+                </div>
+                <div class="card-body p-0" id="carritoItems">
+                    {% for item in items %}
+                        <div class="p-3 border-bottom" id="item-{{ item.id }}">
+                            <div class="row align-items-center">
+                                <!-- Imagen del producto -->
+                                <div class="col-md-2">
+                                    {% if item.producto.imagen %}
+                                        <img src="{{ item.producto.imagen.url }}"
+                                             class="img-fluid rounded"
+                                             alt="{{ item.producto.nombre }}"
+                                             style="width: 80px; height: 80px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                             style="width: 80px; height: 80px;">
+                                            <i class="fas fa-image text-muted fa-2x"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Información del producto -->
+                                <div class="col-md-3">
+                                    <h6 class="mb-1">{{ item.producto.nombre }}</h6>
+                                    <p class="text-muted mb-1 small">{{ item.producto.categoria.nombre }}</p>
+                                    <small class="text-muted">Stock disponible: {{ item.producto.stock }}</small>
+                                </div>
+
+                                <!-- Precio unitario -->
+                                <div class="col-md-2 text-center">
+                                    <strong class="text-primary">
+                                        ${{ item.producto.precio_actual }}
+                                    </strong>
+                                </div>
+
+                                <!-- Cantidad -->
+                                <div class="col-md-2">
+                                    <div class="input-group input-group-sm">
+                                        <button class="btn btn-outline-secondary"
+                                                onclick="cambiarCantidad({{ item.id }}, {{ item.cantidad }} - 1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number"
+                                               class="form-control text-center"
+                                               id="qty-{{ item.id }}"
+                                               value="{{ item.cantidad }}"
+                                               min="1"
+                                               max="{{ item.producto.stock }}"
+                                               onchange="cambiarCantidad({{ item.id }}, this.value)">
+                                        <button class="btn btn-outline-secondary"
+                                                onclick="cambiarCantidad({{ item.id }}, {{ item.cantidad }} + 1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Subtotal y acciones -->
+                                <div class="col-md-3 text-end">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <strong class="text-success" id="subtotal-{{ item.id }}">
+                                            ${{ item.subtotal }}
+                                        </strong>
+                                        <button class="btn btn-outline-danger btn-sm ms-2"
+                                                onclick="eliminarItem({{ item.id }})"
+                                                title="Eliminar producto">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen del carrito -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calculator me-2"></i>
+                        Resumen del Pedido
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Total:</span>
+                        <strong class="text-success fs-4" id="carritoTotalResumen">
+                            ${{ carrito.total_precio }}
+                        </strong>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success btn-lg" onclick="procederPago()">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Proceder al Pago
+                        </button>
+
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Seguir Comprando
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <!-- Carrito vacío -->
+    <div class="text-center py-5">
+        <div class="card p-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+            <h3 class="text-muted">Tu carrito está vacío</h3>
+            <p class="text-muted mb-4">
+                Explora nuestros productos y agrega algunos a tu carrito
+            </p>
+            <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-bag me-2"></i>
+                Explorar Productos
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCsrfToken() {
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) {
+        return csrfInput.value;
+    }
+
+    // Alternativo: buscar en cookies
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'csrftoken') {
+            return value;
+        }
+    }
+
+    console.error('CSRF token no encontrado');
+    return null;
+}
+
+function cambiarCantidad(itemId, nuevaCantidad) {
+    nuevaCantidad = parseInt(nuevaCantidad);
+
+    if (nuevaCantidad < 1) {
+        alert('La cantidad debe ser mayor a 0');
+        return;
+    }
+
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        alert('Error: Token de seguridad no encontrado. Recarga la página.');
+        return;
+    }
+
+    fetch(`/ajax/carrito/actualizar/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            cantidad: nuevaCantidad
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar cantidad en el input
+            document.getElementById(`qty-${itemId}`).value = nuevaCantidad;
+
+            // Actualizar subtotal
+            document.getElementById(`subtotal-${itemId}`).textContent = `$${data.item_subtotal}`;
+
+            // Actualizar totales
+            actualizarTotales(data.carrito_items, data.carrito_total);
+
+            mostrarMensaje(data.message, 'success');
+        } else {
+            mostrarMensaje(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarMensaje('Error al actualizar cantidad', 'error');
+    });
+}
+
+function eliminarItem(itemId) {
+    if (confirm('¿Eliminar este producto del carrito?')) {
+        const csrfToken = getCsrfToken();
+        if (!csrfToken) {
+            alert('Error: Token de seguridad no encontrado. Recarga la página.');
+            return;
+        }
+
+        fetch(`/ajax/carrito/eliminar/${itemId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Eliminar el elemento del DOM
+                document.getElementById(`item-${itemId}`).remove();
+
+                // Actualizar totales
+                actualizarTotales(data.carrito_items, data.carrito_total);
+
+                // Si el carrito está vacío, recargar la página
+                if (data.carrito_items === 0) {
+                    location.reload();
+                }
+
+                mostrarMensaje(data.message, 'success');
+            } else {
+                mostrarMensaje(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarMensaje('Error al eliminar producto', 'error');
+        });
+    }
+}
+
+function limpiarTodoCarrito() {
+    if (confirm('¿Estás seguro de que deseas vaciar todo el carrito?')) {
+        const csrfToken = getCsrfToken();
+        if (!csrfToken) {
+            alert('Error: Token de seguridad no encontrado. Recarga la página.');
+            return;
+        }
+
+        fetch('/ajax/carrito/limpiar/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                mostrarMensaje(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarMensaje('Error al limpiar carrito', 'error');
+        });
+    }
+}
+
+function actualizarTotales(totalItems, totalPrecio) {
+    // Actualizar badge del carrito en la navbar
+    const badge = document.getElementById('carritoBadge');
+    if (badge) {
+        badge.textContent = totalItems;
+    }
+
+    // Actualizar total en el header
+    document.getElementById('totalItemsHeader').textContent = totalItems;
+
+    // Actualizar total en el resumen
+    document.getElementById('carritoTotalResumen').textContent = `$${totalPrecio}`;
+}
+
+function procederPago() {
+    alert('Funcionalidad de pago en desarrollo...\n\nEn una implementación real, aquí se redigiría al sistema de pagos.');
+}
+
+function mostrarMensaje(mensaje, tipo) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-info-circle me-2"></i>
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    const main = document.querySelector('main .container');
+    main.insertBefore(alertDiv, main.firstChild);
+
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Debug: Verificar que el CSRF token esté disponible
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        console.error('⚠️ CSRF token no encontrado al cargar la página');
+    } else {
+        console.log('✅ CSRF token encontrado correctamente');
+    }
+});
+</script>
+{% endblock %}

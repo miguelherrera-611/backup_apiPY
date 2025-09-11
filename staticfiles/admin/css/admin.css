@@ -1,0 +1,100 @@
+/* Gaming Admin CSS - Estilos adicionales */
+
+.gaming-fieldset {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(26, 26, 26, 0.8)) !important;
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin: 15px 0 !important;
+}
+
+.gaming-fieldset legend {
+    background: linear-gradient(45deg, #8b5cf6, #a855f7) !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 20px !important;
+    font-weight: bold !important;
+    font-family: 'Orbitron', monospace !important;
+    border: none !important;
+}
+
+/* Mejoras para tablas inline */
+.tabular {
+    background: rgba(26, 26, 26, 0.8) !important;
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+.tabular thead th {
+    background: linear-gradient(45deg, #8b5cf6, #a855f7) !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.tabular tbody tr {
+    background: rgba(42, 42, 42, 0.8) !important;
+}
+
+.tabular tbody tr:hover {
+    background: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Efectos de hover para elementos interactivos */
+.field-imagen_miniatura img:hover {
+    transform: scale(1.2) !important;
+    transition: transform 0.3s ease !important;
+}
+
+/* Animación para badges */
+@keyframes badgePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.badge-pulse {
+    animation: badgePulse 2s infinite;
+}
+
+/* Estilos para checkboxes */
+input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    accent-color: #8b5cf6 !important;
+    cursor: pointer !important;
+}
+
+/* Mejorar select fields */
+select option {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Efectos de loading */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 10, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c084fc;
+    font-size: 1.2em;
+    z-index: 1000;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .gaming-fieldset {
+        padding: 15px !important;
+        margin: 10px 0 !important;
+    }
+
+    .tabular {
+        font-size: 0.9em !important;
+    }
+}

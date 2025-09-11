@@ -1,0 +1,629 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Admin - Mi Tienda{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<style>
+/* CSS ESPECÍFICO PARA TABLA GAMING OSCURA - MÁXIMA PRIORIDAD */
+.table {
+    background-color: rgba(26, 26, 26, 0.95) !important;
+}
+
+.table tbody tr td,
+.table tbody tr td strong,
+.table tbody tr td div,
+.table tbody tr td span,
+.table tbody tr td small,
+.table tbody tr td .text-muted {
+    color: #ffffff !important;
+    background-color: rgba(26, 26, 26, 0.9) !important;
+    font-weight: 600 !important;
+}
+
+.table thead tr th {
+    color: #ffffff !important;
+    background-color: rgba(10, 10, 10, 0.95) !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid #8b5cf6 !important;
+}
+
+.table tbody tr {
+    background-color: rgba(26, 26, 26, 0.9) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+.table tbody tr:hover td {
+    background-color: rgba(139, 92, 246, 0.2) !important;
+    color: #ffffff !important;
+}
+
+/* Botones gaming visibles */
+.table .btn-outline-danger {
+    background: linear-gradient(45deg, #ef4444, #dc2626) !important;
+    border: 2px solid #ef4444 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.table .btn-outline-danger:hover {
+    background: linear-gradient(45deg, #dc2626, #b91c1c) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.7) !important;
+    color: #ffffff !important;
+}
+
+/* Iconos en botones */
+.table .btn i {
+    color: #ffffff !important;
+}
+
+/* Badges con mejor contraste */
+.table .badge {
+    font-weight: 700 !important;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Bordes gaming */
+.table {
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 15px !important;
+    overflow: hidden !important;
+}
+
+.table td, .table th {
+    border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+/* MODAL GAMING STYLE */
+.modal-content {
+    background: linear-gradient(145deg, rgba(26, 26, 26, 0.98), rgba(42, 42, 42, 0.95)) !important;
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3) !important;
+    backdrop-filter: blur(20px) !important;
+}
+
+.modal-header {
+    background: linear-gradient(45deg, #8b5cf6, #a855f7) !important;
+    border-bottom: 2px solid #c084fc !important;
+    border-radius: 18px 18px 0 0 !important;
+}
+
+.modal-title {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.8) !important;
+}
+
+.modal-body {
+    background: rgba(26, 26, 26, 0.95) !important;
+    color: #ffffff !important;
+}
+
+.modal-footer {
+    background: rgba(26, 26, 26, 0.95) !important;
+    border-top: 1px solid rgba(139, 92, 246, 0.3) !important;
+    border-radius: 0 0 18px 18px !important;
+}
+
+/* Formularios en modal */
+.modal .form-label {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: 0 0 5px rgba(139, 92, 246, 0.5) !important;
+}
+
+.modal .form-control,
+.modal .form-select {
+    background: rgba(15, 15, 15, 0.9) !important;
+    border: 2px solid #8b5cf6 !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus {
+    background: rgba(15, 15, 15, 0.95) !important;
+    border-color: #c084fc !important;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5) !important;
+    color: #ffffff !important;
+}
+
+.modal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-weight: 500 !important;
+}
+
+.modal .input-group-text {
+    background: rgba(139, 92, 246, 0.8) !important;
+    border: 2px solid #8b5cf6 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Checkbox gaming */
+.modal .form-check-input {
+    background-color: rgba(15, 15, 15, 0.9) !important;
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 6px !important;
+}
+
+.modal .form-check-input:checked {
+    background-color: #8b5cf6 !important;
+    border-color: #c084fc !important;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.7) !important;
+}
+
+.modal .form-check-label {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+/* Botón cerrar gaming */
+.btn-close {
+    background: rgba(239, 68, 68, 0.8) !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-close:hover {
+    background: rgba(220, 38, 38, 1) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.7) !important;
+}
+
+/* Botones del modal gaming */
+.modal .btn-secondary {
+    background: linear-gradient(45deg, #6b7280, #4b5563) !important;
+    border: 2px solid #6b7280 !important;
+    color: #ffffff !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    padding: 10px 25px !important;
+}
+
+.modal .btn-secondary:hover {
+    background: linear-gradient(45deg, #4b5563, #374151) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(107, 114, 128, 0.7) !important;
+    color: #ffffff !important;
+}
+
+.modal .btn-success {
+    background: linear-gradient(45deg, #10b981, #059669) !important;
+    border: 2px solid #10b981 !important;
+    color: #ffffff !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    padding: 10px 25px !important;
+}
+
+.modal .btn-success:hover {
+    background: linear-gradient(45deg, #059669, #047857) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.7) !important;
+    color: #ffffff !important;
+}
+
+/* Efectos de resplandor en el modal */
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #8b5cf6, #c084fc, #e879f9, #8b5cf6);
+    border-radius: 22px;
+    z-index: -1;
+    animation: borderGlow 3s linear infinite;
+}
+
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+</style>
+
+<!-- Header del Dashboard -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="text-white">
+            <i class="fas fa-tachometer-alt me-3"></i>
+            Dashboard Administrador
+        </h1>
+        <p class="text-white-50 mb-0">Gestiona tu tienda desde aquí</p>
+    </div>
+    <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#modalProducto">
+        <i class="fas fa-plus me-2"></i>Nuevo Producto
+    </button>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-5">
+    <div class="col-md-3 mb-3">
+        <div class="stats-card card p-4 text-center">
+            <i class="fas fa-boxes fa-3x mb-3"></i>
+            <h3 class="mb-1">{{ total_productos }}</h3>
+            <p class="mb-0">Total Productos</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card card p-4 text-center">
+            <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+            <h3 class="mb-1">{{ productos_disponibles }}</h3>
+            <p class="mb-0">Disponibles</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card card p-4 text-center">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+            <h3 class="mb-1">{{ productos_agotados }}</h3>
+            <p class="mb-0">Sin Stock</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card card p-4 text-center">
+            <i class="fas fa-tags fa-3x mb-3"></i>
+            <h3 class="mb-1">{{ categorias.count }}</h3>
+            <p class="mb-0">Categorías</p>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Productos -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+            <i class="fas fa-list me-2"></i>
+            Últimos Productos
+        </h4>
+        <a href="/admin/" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-cog me-1"></i>Panel Admin Django
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Destacado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                        <tr>
+                            <td><span class="badge bg-secondary">#{{ producto.id }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if producto.imagen %}
+                                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                                             class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ producto.nombre }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ producto.descripcion|truncatewords:5 }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ producto.categoria.nombre }}</span>
+                            </td>
+                            <td>
+                                {% if producto.precio_oferta %}
+                                    <span class="text-decoration-line-through text-muted">${{ producto.precio }}</span>
+                                    <br>
+                                    <strong class="text-success">${{ producto.precio_oferta }}</strong>
+                                {% else %}
+                                    <strong>${{ producto.precio }}</strong>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if producto.stock > 0 %}
+                                    <span class="badge bg-success">{{ producto.stock }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Agotado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if producto.estado == 'disponible' %}
+                                    <span class="badge bg-success">Disponible</span>
+                                {% elif producto.estado == 'agotado' %}
+                                    <span class="badge bg-warning">Agotado</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Descontinuado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if producto.destacado %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-star text-muted"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-outline-danger btn-sm"
+                                        data-producto-id="{{ producto.id }}"
+                                        data-producto-nombre="{{ producto.nombre }}"
+                                        onclick="eliminarProducto(this.dataset.productoId, this.dataset.productoNombre)"
+                                        title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay productos registrados</h5>
+                                <p class="text-muted">Crea tu primer producto usando el botón "Nuevo Producto"</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Crear Producto -->
+<div class="modal fade" id="modalProducto" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Crear Nuevo Producto
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formProducto">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nombre" class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="categoria_id" class="form-label">Categoría *</label>
+                            <select class="form-control" id="categoria_id" name="categoria_id" required>
+                                <option value="">Seleccionar categoría...</option>
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción *</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="precio" class="form-label">Precio *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio" name="precio"
+                                       step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="precio_oferta" class="form-label">Precio Oferta</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio_oferta" name="precio_oferta"
+                                       step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="stock" class="form-label">Stock *</label>
+                            <input type="number" class="form-control" id="stock" name="stock"
+                                   min="0" value="0" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="estado" class="form-label">Estado *</label>
+                            <select class="form-control" id="estado" name="estado" required>
+                                <option value="disponible">Disponible</option>
+                                <option value="agotado">Agotado</option>
+                                <option value="descontinuado">Descontinuado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="destacado" name="destacado">
+                                <label class="form-check-label" for="destacado">
+                                    <i class="fas fa-star text-warning me-1"></i>
+                                    Producto Destacado
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-success" onclick="guardarProducto()">
+                    <i class="fas fa-save me-1"></i>Guardar Producto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enlaces Rápidos -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-bolt me-2"></i>Accesos Rápidos
+                </h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="/admin/productos/producto/" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="fas fa-boxes me-2"></i>Gestionar Productos
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin/productos/categoria/" class="btn btn-outline-info w-100 mb-2">
+                            <i class="fas fa-tags me-2"></i>Gestionar Categorías
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin/auth/user/" class="btn btn-outline-warning w-100 mb-2">
+                            <i class="fas fa-users me-2"></i>Gestionar Usuarios
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/api/productos/" class="btn btn-outline-secondary w-100 mb-2">
+                            <i class="fas fa-code me-2"></i>API REST
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Función para guardar producto
+function guardarProducto() {
+    const form = document.getElementById('formProducto');
+    const formData = new FormData(form);
+
+    // Convertir a JSON
+    const data = {
+        nombre: formData.get('nombre'),
+        descripcion: formData.get('descripcion'),
+        precio: parseFloat(formData.get('precio')),
+        precio_oferta: formData.get('precio_oferta') ? parseFloat(formData.get('precio_oferta')) : null,
+        categoria_id: parseInt(formData.get('categoria_id')),
+        stock: parseInt(formData.get('stock')),
+        estado: formData.get('estado'),
+        destacado: document.getElementById('destacado').checked
+    };
+
+    // Validación básica
+    if (!data.nombre || !data.descripcion || !data.precio || !data.categoria_id) {
+        alert('Por favor completa todos los campos obligatorios');
+        return;
+    }
+
+    // Obtener token CSRF
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Enviar datos
+    fetch('/ajax/crear-producto/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Producto creado exitosamente');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al crear el producto');
+    });
+}
+
+// Función para eliminar producto
+function eliminarProducto(id, nombre) {
+    if (confirm('¿Estás seguro de que deseas eliminar "' + nombre + '"?')) {
+        // Obtener token CSRF
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch('/ajax/eliminar-producto/' + id + '/', {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Producto eliminado exitosamente');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar el producto');
+        });
+    }
+}
+
+// Validación de precios
+document.addEventListener('DOMContentLoaded', function() {
+    const precioOferta = document.getElementById('precio_oferta');
+    const precio = document.getElementById('precio');
+
+    if (precioOferta && precio) {
+        precioOferta.addEventListener('input', function() {
+            const precioNormal = parseFloat(precio.value);
+            const precioOfertaValue = parseFloat(this.value);
+
+            if (precioOfertaValue && precioNormal && precioOfertaValue >= precioNormal) {
+                alert('El precio de oferta debe ser menor al precio normal');
+                this.value = '';
+            }
+        });
+    }
+});
+
+// Limpiar formulario al cerrar modal
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modalProducto');
+    if (modal) {
+        modal.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('formProducto').reset();
+        });
+    }
+});
+</script>
+{% endblock %}

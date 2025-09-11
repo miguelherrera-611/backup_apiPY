@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GAMERLY{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --gaming-black: #0a0a0a;
+            --gaming-dark: #1a1a1a;
+            --gaming-gray: #2a2a2a;
+            --gaming-purple: #8b5cf6;
+            --gaming-purple-light: #a855f7;
+            --gaming-purple-dark: #7c3aed;
+            --gaming-neon: #c084fc;
+            --gaming-accent: #e879f9;
+            --gaming-success: #10b981;
+            --gaming-warning: #f59e0b;
+            --gaming-danger: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--gaming-black) 0%, var(--gaming-dark) 50%, #1e1b4b 100%);
+            min-height: 100vh;
+            font-family: 'Rajdhani', sans-serif;
+            color: #ffffff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Efectos de fondo gaming */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--gaming-purple);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px var(--gaming-neon);
+        }
+
+        .card {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.8));
+            border: 1px solid var(--gaming-purple);
+            border-radius: 20px;
+            box-shadow:
+                0 8px 32px rgba(139, 92, 246, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow:
+                0 20px 40px rgba(139, 92, 246, 0.4),
+                0 0 20px rgba(192, 132, 252, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border-color: var(--gaming-neon);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow:
+                0 10px 25px rgba(139, 92, 246, 0.5),
+                0 0 20px var(--gaming-neon);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--gaming-success), #059669);
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-outline-danger {
+            border: 2px solid var(--gaming-danger);
+            color: var(--gaming-danger);
+            border-radius: 25px;
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--gaming-danger);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(26, 26, 26, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--gaming-purple);
+            border-radius: 30px;
+            padding: 60px 40px;
+            margin: 50px 0;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--gaming-neon), transparent);
+            animation: rotate 4s linear infinite;
+            opacity: 0.1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .product-card {
+            height: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: left 0.5s;
+            z-index: 1;
+        }
+
+        .product-card:hover::before {
+            left: 100%;
+        }
+
+        .product-image {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+
+        .badge-admin {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+            color: white;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .badge-cliente {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            color: white;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(26, 26, 26, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--gaming-purple);
+            color: white;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Estilos del Carrito */
+        .carrito-icon {
+            position: relative;
+            color: var(--gaming-neon);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carrito-icon:hover {
+            color: var(--gaming-accent);
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 10px var(--gaming-neon));
+        }
+
+        .carrito-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(239, 68, 68, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
+        }
+
+        .carrito-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: linear-gradient(145deg, var(--gaming-dark), var(--gaming-gray));
+            border: 1px solid var(--gaming-purple);
+            border-radius: 15px;
+            box-shadow:
+                0 10px 30px rgba(139, 92, 246, 0.3),
+                0 0 20px rgba(192, 132, 252, 0.2);
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(20px);
+        }
+
+        .carrito-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .carrito-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+            transition: background-color 0.3s ease;
+            color: white;
+        }
+
+        .carrito-item:hover {
+            background-color: rgba(139, 92, 246, 0.1);
+        }
+
+        .carrito-item-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--gaming-purple);
+        }
+
+        .btn-carrito {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            border: none;
+            color: white;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-carrito:hover {
+            transform: scale(1.05);
+            color: white;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+        }
+
+        /* Dropdown menu gaming */
+        .dropdown-menu {
+            background: linear-gradient(145deg, var(--gaming-dark), var(--gaming-gray));
+            border: 2px solid var(--gaming-purple);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            backdrop-filter: blur(20px);
+        }
+
+        .dropdown-item {
+            color: #ffffff !important;
+            font-weight: 500;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 2px 8px;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+            color: white !important;
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+
+        .dropdown-divider {
+            border-color: rgba(139, 92, 246, 0.3);
+            margin: 8px 0;
+        }
+
+        /* Estilos para formularios */
+        .form-control {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid var(--gaming-purple);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .form-control:focus {
+            background: rgba(26, 26, 26, 0.9);
+            border-color: var(--gaming-neon);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+            color: white;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Alertas gaming */
+        .alert-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(26, 26, 26, 0.8));
+            border: 1px solid var(--gaming-success);
+            color: white;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(26, 26, 26, 0.8));
+            border: 1px solid var(--gaming-danger);
+            color: white;
+        }
+
+        /* Badges */
+        .badge {
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+
+        .bg-warning {
+            background: linear-gradient(45deg, var(--gaming-warning), #d97706) !important;
+        }
+
+        .bg-success {
+            background: linear-gradient(45deg, var(--gaming-success), #059669) !important;
+        }
+
+        .bg-danger {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+        }
+
+        .bg-info {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+        }
+
+        /* Tabla gaming */
+        .table {
+            color: white;
+        }
+
+        .table-dark {
+            background: linear-gradient(135deg, var(--gaming-dark), var(--gaming-gray));
+            border-color: var(--gaming-purple);
+        }
+
+        /* Paginación */
+        .pagination .page-link {
+            background: rgba(15, 15, 15, 0.9);
+            border: 2px solid var(--gaming-purple);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .pagination .page-link:hover {
+            background: var(--gaming-purple);
+            border-color: var(--gaming-neon);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            border-color: var(--gaming-neon);
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        /* Texto gaming */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+
+        .text-primary {
+            color: var(--gaming-neon) !important;
+        }
+
+        .text-success {
+            color: var(--gaming-success) !important;
+        }
+
+        /* Scrollbar gaming */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gaming-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gaming-neon);
+        }
+
+        /* FORZAR TODO A BLANCO - REGLAS AGRESIVAS */
+        * {
+            color: #ffffff !important;
+        }
+
+        /* Excepciones específicas para elementos que necesitan otros colores */
+        .btn-primary, .btn-success, .btn-info, .btn-warning, .btn-danger,
+        .badge, .bg-primary, .bg-success, .bg-info, .bg-warning, .bg-danger,
+        .text-primary, .text-success, .text-info, .text-warning, .text-danger {
+            color: inherit !important;
+        }
+
+        /* Asegurar que los precios y descripciones sean blancos */
+        .card .h4, .card .fs-4, .card .text-success, .card .text-primary,
+        .card p, .card span, .card div, .card small, .card .text-muted {
+            color: #ffffff !important;
+        }
+
+        /* Forzar texto blanco en productos */
+        .product-card *, .card-body *, .card-text *, .card-title * {
+            color: #ffffff !important;
+        }
+
+        /* Excepciones para botones y badges que deben mantener su color */
+        .btn *, .badge *, .bg-* {
+            color: inherit !important;
+        }
+
+        /* Forzar descripción de productos */
+        .card-text {
+            color: #ffffff !important;
+        }
+
+        /* Forzar precios */
+        .h4, .fs-4, .text-success, .text-primary, .fw-bold {
+            color: #ffffff !important;
+        }
+
+        /* Forzar todo el contenido de cards */
+        .card * {
+            color: #ffffff !important;
+        }
+
+        /* Excepciones específicas para elementos que deben tener color */
+        .card .btn, .card .badge, .card .bg-info, .card .bg-success,
+        .card .bg-warning, .card .bg-danger {
+            color: inherit !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                <i class="fas fa-gamepad text-primary me-2"></i>
+                <span class="text-primary">GAMERLY</span>
+            </a>
+
+            <!-- AQUÍ ESTÁ LA PARTE ACTUALIZADA CON REGISTRO Y PERFIL -->
+            <div class="navbar-nav ms-auto d-flex align-items-center">
+                {% if user.is_authenticated %}
+                    <!-- Carrito (solo para clientes) -->
+                    {% if not user.is_superuser %}
+                        {% load carrito_tags %}
+                        <div class="position-relative me-3" id="carritoContainer">
+                            <div class="carrito-icon" onclick="toggleCarrito()">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="carrito-badge" id="carritoBadge">
+                                    {% carrito_items_count user %}
+                                </span>
+                            </div>
+
+                            <!-- Dropdown del carrito -->
+                            <div class="carrito-dropdown" id="carritoDropdown">
+                                <div class="p-3 border-bottom bg-primary text-white text-center">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-shopping-cart me-2"></i>Mi Carrito
+                                    </h6>
+                                </div>
+                                <div id="carritoItems">
+                                    <!-- Los items se cargarán aquí via JavaScript -->
+                                </div>
+                                <div class="p-3 border-top">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Total: </strong>
+                                        <strong id="carritoTotal">$0.00</strong>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'ver_carrito' %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Ver Carrito
+                                        </a>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="limpiarCarrito()">
+                                            <i class="fas fa-trash me-1"></i>Limpiar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Dropdown de Usuario Logueado -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle text-primary me-2"></i>
+                            <span>{{ user.first_name|default:user.username }}</span>
+                            {% if user.is_superuser %}
+                                <span class="badge-admin ms-2">
+                                    <i class="fas fa-crown me-1"></i>Admin
+                                </span>
+                            {% else %}
+                                <span class="badge-cliente ms-2">
+                                    <i class="fas fa-user me-1"></i>Cliente
+                                </span>
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            {% if not user.is_superuser %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'perfil' %}">
+                                        <i class="fas fa-user-edit me-2"></i>Mi Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'ver_carrito' %}">
+                                        <i class="fas fa-shopping-cart me-2"></i>Mi Carrito
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                            {% else %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'dashboard' %}">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/">
+                                        <i class="fas fa-cogs me-2"></i>Panel Django
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <!-- Botones para usuarios no logueados -->
+                    <div class="d-flex align-items-center">
+                        <a class="btn btn-outline-primary me-2" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
+                        </a>
+                        <a class="btn btn-primary" href="{% url 'registro' %}">
+                            <i class="fas fa-user-plus me-1"></i>Crear Cuenta
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main style="margin-top: 100px;">
+        <div class="container">
+            <!-- Mensajes -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Scripts del Carrito -->
+    {% if user.is_authenticated and not user.is_superuser %}
+    <script>
+        let carritoAbierto = false;
+
+        function toggleCarrito() {
+            const dropdown = document.getElementById('carritoDropdown');
+            carritoAbierto = !carritoAbierto;
+
+            if (carritoAbierto) {
+                dropdown.classList.add('show');
+                cargarCarrito();
+            } else {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        // Cerrar carrito al hacer click fuera
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('carritoContainer');
+            if (!container.contains(event.target) && carritoAbierto) {
+                document.getElementById('carritoDropdown').classList.remove('show');
+                carritoAbierto = false;
+            }
+        });
+
+        function cargarCarrito() {
+            fetch('/api/carrito-info/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('carritoBadge').textContent = data.total_items || 0;
+                    document.getElementById('carritoTotal').textContent = `$${data.total_precio || 0}`;
+
+                    // Aquí podrías cargar los items del carrito si tienes un endpoint para eso
+                    // Por ahora solo actualizamos el contador y total
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function agregarAlCarrito(productoId, cantidad = 1) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (!csrfToken) {
+                console.error('CSRF token no encontrado');
+                return;
+            }
+
+            fetch('/ajax/carrito/agregar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    producto_id: productoId,
+                    cantidad: cantidad
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar badge del carrito
+                    document.getElementById('carritoBadge').textContent = data.carrito_items;
+
+                    // Mostrar mensaje de éxito
+                    mostrarMensaje(data.message, 'success');
+
+                    // Recargar carrito si está abierto
+                    if (carritoAbierto) {
+                        cargarCarrito();
+                    }
+                } else {
+                    mostrarMensaje(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarMensaje('Error al agregar producto al carrito', 'error');
+            });
+        }
+
+        function limpiarCarrito() {
+            if (confirm('¿Estás seguro de que deseas limpiar el carrito?')) {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+                if (!csrfToken) {
+                    console.error('CSRF token no encontrado');
+                    return;
+                }
+
+                fetch('/ajax/carrito/limpiar/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Actualizar badge del carrito
+                        document.getElementById('carritoBadge').textContent = '0';
+                        document.getElementById('carritoTotal').textContent = '$0.00';
+
+                        // Cerrar dropdown
+                        document.getElementById('carritoDropdown').classList.remove('show');
+                        carritoAbierto = false;
+
+                        mostrarMensaje(data.message, 'success');
+                    } else {
+                        mostrarMensaje(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensaje('Error al limpiar carrito', 'error');
+                });
+            }
+        }
+
+        function mostrarMensaje(mensaje, tipo) {
+            // Crear elemento de alerta
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${tipo === 'success' ? 'success' : tipo === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-info-circle me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            // Insertar al inicio del contenido principal
+            const main = document.querySelector('main .container');
+            main.insertBefore(alertDiv, main.firstChild);
+
+            // Auto-eliminar después de 5 segundos
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Cargar información inicial del carrito
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarCarrito();
+        });
+    </script>
+    {% endif %}
+
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>

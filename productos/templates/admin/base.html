@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+{% load i18n static %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr,auto" }}">
+<head>
+    <title>{% block title %}{% endblock %} | GAMERLY Admin</title>
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/base.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/nav_sidebar.css" %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS GAMING PARA HISTORIAL - LÍNEA AGREGADA AQUÍ -->
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/history-gaming.css" %}">
+
+    <style>
+        :root {
+            --gaming-black: #0a0a0a;
+            --gaming-dark: #1a1a1a;
+            --gaming-gray: #2a2a2a;
+            --gaming-purple: #8b5cf6;
+            --gaming-purple-light: #a855f7;
+            --gaming-purple-dark: #7c3aed;
+            --gaming-neon: #c084fc;
+            --gaming-accent: #e879f9;
+            --gaming-success: #10b981;
+            --gaming-warning: #f59e0b;
+            --gaming-danger: #ef4444;
+        }
+
+        /* OVERRIDE DJANGO ADMIN STYLES */
+        body {
+            background: linear-gradient(135deg, var(--gaming-black) 0%, var(--gaming-dark) 50%, #1e1b4b 100%) !important;
+            font-family: 'Rajdhani', sans-serif !important;
+            color: #ffffff !important;
+            margin: 0 !important;
+        }
+
+        /* Header Gaming */
+        #header {
+            background: linear-gradient(45deg, var(--gaming-dark), var(--gaming-purple-dark)) !important;
+            border-bottom: 3px solid var(--gaming-purple) !important;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4) !important;
+            height: 60px !important;
+        }
+
+        #branding h1, #branding h1 a:link, #branding h1 a:visited {
+            color: var(--gaming-neon) !important;
+            font-family: 'Orbitron', monospace !important;
+            font-weight: 900 !important;
+            text-shadow: 0 0 15px var(--gaming-neon) !important;
+            font-size: 24px !important;
+        }
+
+        #branding h1::before {
+            content: "🎮 ";
+            font-size: 28px !important;
+            margin-right: 10px;
+        }
+
+        #user-tools {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        #user-tools a {
+            color: var(--gaming-accent) !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+        }
+
+        #user-tools a:hover {
+            color: var(--gaming-neon) !important;
+            text-shadow: 0 0 10px var(--gaming-neon) !important;
+        }
+
+        /* Sidebar Gaming */
+        #nav-sidebar {
+            background: linear-gradient(180deg, var(--gaming-dark), var(--gaming-gray)) !important;
+            border-right: 2px solid var(--gaming-purple) !important;
+            box-shadow: 4px 0 20px rgba(139, 92, 246, 0.3) !important;
+        }
+
+        .module h2 {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+            color: white !important;
+            font-family: 'Orbitron', monospace !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            padding: 15px !important;
+            border-radius: 10px 10px 0 0 !important;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+        }
+
+        .module {
+            background: rgba(26, 26, 26, 0.9) !important;
+            border: 2px solid var(--gaming-purple) !important;
+            border-radius: 12px !important;
+            margin-bottom: 20px !important;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        #nav-sidebar .current-app {
+            background: rgba(139, 92, 246, 0.3) !important;
+            border-radius: 8px !important;
+        }
+
+        #nav-sidebar a {
+            color: #ffffff !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+            padding: 12px 15px !important;
+            border-radius: 6px !important;
+            margin: 2px 8px !important;
+            display: block !important;
+        }
+
+        #nav-sidebar a:hover {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+            color: white !important;
+            transform: translateX(5px) !important;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.6) !important;
+        }
+
+        /* Main content area */
+        #content {
+            background: rgba(10, 10, 10, 0.8) !important;
+            padding: 30px !important;
+            border-radius: 15px !important;
+            margin: 20px !important;
+            border: 1px solid var(--gaming-purple) !important;
+            backdrop-filter: blur(20px) !important;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2) !important;
+        }
+
+        /* Tables Gaming */
+        .results {
+            background: linear-gradient(145deg, var(--gaming-dark), var(--gaming-gray)) !important;
+            border: 2px solid var(--gaming-purple) !important;
+            border-radius: 15px !important;
+            overflow: hidden !important;
+        }
+
+        #result_list thead th {
+            background: linear-gradient(45deg, var(--gaming-purple-dark), var(--gaming-purple)) !important;
+            color: white !important;
+            font-family: 'Orbitron', monospace !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            border-bottom: 2px solid var(--gaming-neon) !important;
+            padding: 15px 12px !important;
+        }
+
+        #result_list tbody tr {
+            background: rgba(26, 26, 26, 0.9) !important;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        #result_list tbody tr:hover {
+            background: rgba(139, 92, 246, 0.2) !important;
+            transform: scale(1.01) !important;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3) !important;
+        }
+
+        #result_list tbody td {
+            color: #ffffff !important;
+            font-weight: 500 !important;
+            padding: 15px 12px !important;
+        }
+
+        /* Buttons Gaming */
+        .button, .default, .deletelink, .addlink {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 12px 24px !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            transition: all 0.3s ease !important;
+            font-family: 'Rajdhani', sans-serif !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+            margin: 5px !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+        }
+
+        .button:hover, .default:hover, .deletelink:hover, .addlink:hover {
+            background: linear-gradient(45deg, var(--gaming-purple-light), var(--gaming-neon)) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5) !important;
+            color: white !important;
+        }
+
+        .deletelink {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+        }
+
+        .deletelink:hover {
+            background: linear-gradient(45deg, #dc2626, #b91c1c) !important;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5) !important;
+        }
+
+        /* Forms Gaming */
+        .form-row {
+            background: rgba(26, 26, 26, 0.8) !important;
+            padding: 20px !important;
+            margin: 15px 0 !important;
+            border-radius: 12px !important;
+            border: 1px solid var(--gaming-purple) !important;
+        }
+
+        input[type="text"], input[type="email"], input[type="number"],
+        textarea, select {
+            background: rgba(15, 15, 15, 0.9) !important;
+            border: 2px solid var(--gaming-purple) !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            font-family: 'Rajdhani', sans-serif !important;
+            font-weight: 500 !important;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--gaming-neon) !important;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5) !important;
+            outline: none !important;
+        }
+
+        label {
+            color: var(--gaming-neon) !important;
+            font-weight: 600 !important;
+            font-family: 'Orbitron', monospace !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+        }
+
+        /* Breadcrumbs Gaming */
+        .breadcrumbs {
+            background: linear-gradient(45deg, var(--gaming-gray), var(--gaming-dark)) !important;
+            border: 1px solid var(--gaming-purple) !important;
+            border-radius: 25px !important;
+            padding: 12px 20px !important;
+            margin-bottom: 20px !important;
+            font-family: 'Rajdhani', sans-serif !important;
+            font-weight: 600 !important;
+        }
+
+        .breadcrumbs a {
+            color: var(--gaming-accent) !important;
+            text-decoration: none !important;
+        }
+
+        .breadcrumbs a:hover {
+            color: var(--gaming-neon) !important;
+            text-shadow: 0 0 10px var(--gaming-neon) !important;
+        }
+
+        /* Messages Gaming */
+        .messagelist {
+            background: linear-gradient(45deg, var(--gaming-success), #059669) !important;
+            border: 2px solid var(--gaming-success) !important;
+            border-radius: 12px !important;
+            color: white !important;
+            padding: 15px 20px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .messagelist.error {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+            border-color: var(--gaming-danger) !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
+        }
+
+        /* Headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--gaming-neon) !important;
+            font-family: 'Orbitron', monospace !important;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5) !important;
+        }
+
+        /* Background effects */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Gaming scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gaming-dark);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            border-radius: 10px;
+            border: 2px solid var(--gaming-dark);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gaming-neon);
+        }
+
+        /* Responsive layout */
+        @media (max-width: 768px) {
+            .content {
+                margin-left: 0 !important;
+            }
+
+            #nav-sidebar {
+                position: relative !important;
+                width: 100% !important;
+                min-height: auto !important;
+            }
+        }
+
+
+
+
+
+
+
+
+        /* SOLUCIÓN DIRECTA PARA HISTORIAL - AGREGAR AL FINAL DEL <style> EN base.html */
+
+/* FORZAR TODO EL CONTENIDO DEL HISTORIAL A SER VISIBLE */
+#content-main,
+#content-main *,
+#content-main ul,
+#content-main ul li,
+#content-main .module,
+#content-main .module *,
+#content-main .module ul,
+#content-main .module ul li,
+#content-main .module h2,
+#content-main p,
+#content-main div,
+#content-main span,
+#content-main strong,
+#content-main em,
+#content-main a {
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
+/* ESPECÍFICO PARA MÓDULOS DEL HISTORIAL */
+.module {
+    background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.9)) !important;
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 15px !important;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3) !important;
+    margin-bottom: 25px !important;
+    overflow: hidden !important;
+}
+
+.module h2 {
+    background: linear-gradient(45deg, #8b5cf6, #a855f7) !important;
+    color: white !important;
+    font-family: 'Orbitron', monospace !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    padding: 15px 20px !important;
+    margin: 0 !important;
+    border-radius: 13px 13px 0 0 !important;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+}
+
+.module ul {
+    background: rgba(26, 26, 26, 0.9) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+.module ul li {
+    background: rgba(42, 42, 42, 0.9) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.3) !important;
+    padding: 15px 20px !important;
+    margin: 0 !important;
+    color: #ffffff !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.module ul li:last-child {
+    border-bottom: none !important;
+    border-radius: 0 0 13px 13px !important;
+}
+
+.module ul li:hover {
+    background: rgba(139, 92, 246, 0.2) !important;
+    transform: translateX(5px) !important;
+    border-left: 4px solid #c084fc !important;
+}
+
+.module ul li a {
+    color: #c084fc !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+}
+
+.module ul li a:hover {
+    color: #e879f9 !important;
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.7) !important;
+}
+
+/* SI NO HAY HISTORIAL */
+.module p {
+    color: #ffffff !important;
+    padding: 30px 20px !important;
+    text-align: center !important;
+    font-style: italic !important;
+    background: rgba(26, 26, 26, 0.8) !important;
+    margin: 0 !important;
+}
+
+/* ENCABEZADOS */
+#content h1 {
+    color: #c084fc !important;
+    font-family: 'Orbitron', monospace !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 15px rgba(192, 132, 252, 0.5) !important;
+    margin-bottom: 25px !important;
+}
+
+/* BREADCRUMBS */
+.breadcrumbs {
+    background: linear-gradient(45deg, #2a2a2a, #1a1a1a) !important;
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 25px !important;
+    padding: 12px 25px !important;
+    margin-bottom: 25px !important;
+    color: #ffffff !important;
+    font-family: 'Rajdhani', sans-serif !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2) !important;
+}
+
+.breadcrumbs * {
+    color: #ffffff !important;
+}
+
+.breadcrumbs a {
+    color: #c084fc !important;
+    text-decoration: none !important;
+}
+
+.breadcrumbs a:hover {
+    color: #e879f9 !important;
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.7) !important;
+}
+
+/* REGLAS MUY ESPECÍFICAS PARA OVERRIDEAR TODO */
+body.change-list #content-main *,
+body.change-form #content-main *,
+body.object-history #content-main *,
+body#admin-index #content-main * {
+    color: #ffffff !important;
+}
+
+/* FORZAR ENLACES A SER VISIBLES */
+#content-main a,
+#content-main a:link,
+#content-main a:visited {
+    color: #c084fc !important;
+}
+
+#content-main a:hover {
+    color: #e879f9 !important;
+}
+
+/* PARA TABLAS EN HISTORIAL SI LAS HAY */
+table, table * {
+    color: #ffffff !important;
+    background: rgba(42, 42, 42, 0.9) !important;
+}
+
+table th {
+    background: linear-gradient(45deg, #8b5cf6, #a855f7) !important;
+    color: #ffffff !important;
+}
+
+table td {
+    background: rgba(42, 42, 42, 0.9) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+table tr:hover td {
+    background: rgba(139, 92, 246, 0.2) !important;
+}
+    </style>
+
+    {% block extrahead %}{% endblock %}
+    {% block responsive %}
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static "admin/css/responsive.css" %}">
+    {% endblock %}
+    {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+</head>
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% now "Z" %}">
+
+<div id="container">
+    {% if not is_popup %}
+    <div id="header">
+        <div id="branding">
+            {% block branding %}
+            <h1 id="site-name">
+                <a href="{% url 'admin:index' %}">
+                    GAMERLY Administration
+                </a>
+            </h1>
+            {% endblock %}
+        </div>
+        {% block usertools %}
+        {% if has_permission %}
+        <div id="user-tools">
+            {% block welcome-msg %}
+                {% trans 'Welcome,' %}
+                <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+            {% endblock %}
+            {% block userlinks %}
+                {% if site_url %}
+                    <a href="{{ site_url }}">{% trans 'View site' %}</a> /
+                {% endif %}
+                {% if user.is_active and user.is_staff %}
+                    {% url 'django-admindocs-docroot' as docsroot %}
+                    {% if docsroot %}
+                        <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+                    {% endif %}
+                {% endif %}
+                {% if user.has_usable_password %}
+                <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+                {% endif %}
+                <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+            {% endblock %}
+        </div>
+        {% endif %}
+        {% endblock %}
+    </div>
+    {% block nav-global %}{% endblock %}
+    {% endif %}
+
+    <div class="main" id="main">
+        {% if not is_popup and is_nav_sidebar_enabled %}
+            {% block nav-sidebar %}
+                {% include "admin/nav_sidebar.html" %}
+            {% endblock %}
+        {% endif %}
+
+        <div class="content">
+            {% block messages %}
+                {% if messages %}
+                <ul class="messagelist">
+                {% for message in messages %}
+                  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+            {% endblock messages %}
+
+            <div id="content" class="{% block coltype %}colM{% endblock %}">
+                {% block pretitle %}{% endblock %}
+                {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+                {% block content %}
+                {% block object-tools %}{% endblock %}
+                {{ content }}
+                {% endblock %}
+                {% block sidebar %}{% endblock %}
+                <br class="clear">
+            </div>
+
+            {% block footer %}<div id="footer"></div>{% endblock %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const siteTitle = document.getElementById('site-name');
+    if (siteTitle) {
+        siteTitle.style.animation = 'glow 2s ease-in-out infinite alternate';
+    }
+
+    const tableRows = document.querySelectorAll('#result_list tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(5px)';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log(`🎮 GAMERLY Admin Panel Loaded! Welcome to the gaming experience! 🚀`);
+});
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes glow {
+        from { text-shadow: 0 0 10px #c084fc, 0 0 20px #c084fc; }
+        to { text-shadow: 0 0 20px #c084fc, 0 0 30px #c084fc; }
+    }
+`;
+
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>
