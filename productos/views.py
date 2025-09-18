@@ -371,6 +371,51 @@ def ver_carrito(request):
     return render(request, 'carrito.html', context)
 
 
+@login_required
+def carrito_items_ajax(request):
+    """Obtener items del carrito para mostrar en el dropdown"""
+    try:
+        carrito = request.user.carrito
+        # MOSTRAR TODOS los items sin limitación
+        items = carrito.items.select_related('producto').all()
+
+        items_data = []
+        for item in items:
+            items_data.append({
+                'id': item.id,
+                'producto_id': item.producto.id,
+                'nombre': item.producto.nombre,
+                'precio': float(item.producto.precio_actual()),
+                'cantidad': item.cantidad,
+                'subtotal': float(item.subtotal()),
+                'imagen_url': item.producto.imagen.url if item.producto.imagen else None,
+                'categoria': item.producto.categoria.nombre,
+            })
+
+        return JsonResponse({
+            'success': True,
+            'items': items_data,
+            'total_items': carrito.total_items(),
+            'total_precio': float(carrito.total_precio()),
+            'items_count': items.count(),
+            'has_more': False  # Ya no limitamos
+        })
+    except Carrito.DoesNotExist:
+        return JsonResponse({
+            'success': True,
+            'items': [],
+            'total_items': 0,
+            'total_precio': 0.0,
+            'items_count': 0,
+            'has_more': False
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error: {str(e)}'
+        })
+
+
 # ====================== VISTAS DE USUARIO ======================
 
 def registro_view(request):
@@ -681,3 +726,78 @@ def carrito_info(request):
             'total_items': 0,
             'total_precio': 0
         })
+
+
+def detalle_producto(request, producto_id):
+    """Vista de detalle de un producto específico"""
+    producto = get_object_or_404(Producto, id=producto_id, estado='disponible')
+
+    # Productos relacionados de la misma categoría (excluyendo el actual)
+    productos_relacionados = Producto.objects.filter(
+        categoria=producto.categoria,
+        estado='disponible'
+    ).exclude(id=producto.id)[:4]
+
+    # Asegurar que el carrito exista si el usuario está autenticado
+    carrito = None
+    if request.user.is_authenticated:
+        carrito, created = Carrito.objects.get_or_create(usuario=request.user)
+
+    context = {
+        'producto': producto,
+        'productos_relacionados': productos_relacionados,
+        'carrito': carrito,
+    }
+    return render(request, 'detalle_producto.html', context)
+
+def recuperar_password_view(request):
+    """Vista para recuperar contraseña"""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        current_password = request.POST.get('current_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+
+        # Validaciones
+        if not all([username, current_password, new_password1, new_password2]):
+            messages.error(request, 'Todos los campos son obligatorios')
+            return render(request, 'recuperar_password.html')
+
+        if new_password1 != new_password2:
+            messages.error(request, 'Las nuevas contraseñas no coinciden')
+            return render(request, 'recuperar_password.html')
+
+        if len(new_password1) < 8:
+            messages.error(request, 'La nueva contraseña debe tener al menos 8 caracteres')
+            return render(request, 'recuperar_password.html')
+
+        try:
+            # Verificar que el usuario existe
+            user = User.objects.get(username=username)
+
+            # Verificar contraseña actual
+            if not user.check_password(current_password):
+                messages.error(request, 'La contraseña actual es incorrecta')
+                return render(request, 'recuperar_password.html')
+
+            # Cambiar contraseña
+            user.set_password(new_password1)
+            user.save()
+
+            messages.success(request,
+                             'Contraseña cambiada exitosamente. Puedes iniciar sesión con tu nueva contraseña.')
+            return redirect('login')
+
+        except User.DoesNotExist:
+            messages.error(request, 'El usuario no existe')
+            return render(request, 'recuperar_password.html')
+        except Exception as e:
+            messages.error(request, f'Error al cambiar contraseña: {str(e)}')
+            return render(request, 'recuperar_password.html')
+
+    return render(request, 'recuperar_password.html')
+
+

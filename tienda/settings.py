@@ -121,3 +121,17 @@ TEMPLATES[0]['DIRS'] = [
     BASE_DIR / 'templates',
     BASE_DIR / 'productos/templates',  # Para que encuentre admin/
 ]
+
+# Agregar al final de tienda/settings.py
+
+# Configuración de Email con Gmail SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'gamerly_0131@gmail.com'  # Tu email de Gmail
+EMAIL_HOST_PASSWORD = 'tu_contraseña_de_app_aqui'  # Contraseña de aplicación (NO la contraseña normal)
+DEFAULT_FROM_EMAIL = 'GAMERLY <gamerly_0131@gmail.com>'
+
+# Para desarrollo/testing (descomenta si quieres ver emails en consola)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

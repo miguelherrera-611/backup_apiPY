@@ -74,13 +74,15 @@
                 <div class="card product-card h-100">
                     <!-- Imagen del producto -->
                     <div class="position-relative">
-                        {% if producto.imagen %}
-                            <img src="{{ producto.imagen.url }}" class="card-img-top product-image" alt="{{ producto.nombre }}">
-                        {% else %}
-                            <div class="product-image bg-gradient d-flex align-items-center justify-content-center">
-                                <i class="fas fa-image fa-4x text-white-50"></i>
-                            </div>
-                        {% endif %}
+                        <a href="{% url 'detalle_producto' producto.id %}" style="text-decoration: none;">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" class="card-img-top product-image" alt="{{ producto.nombre }}">
+                            {% else %}
+                                <div class="product-image bg-gradient d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image fa-4x text-white-50"></i>
+                                </div>
+                            {% endif %}
+                        </a>
 
                         <!-- Badges superiores -->
                         <div class="position-absolute top-0 start-0 p-2">
@@ -113,7 +115,9 @@
                     <!-- Contenido de la carta -->
                     <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0">{{ producto.nombre }}</h5>
+                            <a href="{% url 'detalle_producto' producto.id %}" style="text-decoration: none; color: inherit;">
+                                <h5 class="card-title mb-0">{{ producto.nombre }}</h5>
+                            </a>
                             <span class="badge bg-info">{{ producto.categoria.nombre }}</span>
                         </div>
 
@@ -155,28 +159,36 @@
                                 </small>
                             </div>
 
-                            <!-- CARRITO CON CANTIDAD -->
-                            {% if producto.en_stock %}
-                                <div class="mb-2">
-                                    <label class="form-label mb-1">Cantidad:</label>
-                                    <select class="form-control form-control-sm mb-2" id="qty{{ producto.id }}">
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                    </select>
+                            <!-- Botones de acción -->
+                            <div class="row g-2">
+                                <div class="col-8">
+                                    {% if producto.en_stock %}
+                                        <div class="mb-2">
+                                            <select class="form-control form-control-sm" id="qty{{ producto.id }}">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-success btn-sm w-100" onclick="agregarAlCarrito({{ producto.id }})">
+                                            <i class="fas fa-cart-plus me-1"></i>
+                                            Agregar
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                                            <i class="fas fa-times me-1"></i>
+                                            Agotado
+                                        </button>
+                                    {% endif %}
                                 </div>
-                                <button class="btn btn-success w-100" onclick="agregarAlCarrito({{ producto.id }})">
-                                    <i class="fas fa-cart-plus me-2"></i>
-                                    Agregar al Carrito
-                                </button>
-                            {% else %}
-                                <button class="btn btn-secondary w-100" disabled>
-                                    <i class="fas fa-times me-2"></i>
-                                    Producto Agotado
-                                </button>
-                            {% endif %}
+                                <div class="col-4">
+                                    <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-outline-primary btn-sm w-100" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -287,7 +299,7 @@ function agregarAlCarrito(productoId) {
     var textoOriginal = boton.innerHTML;
 
     boton.disabled = true;
-    boton.innerHTML = 'Agregando...';
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Agregando...';
 
     var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -305,7 +317,10 @@ function agregarAlCarrito(productoId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
+            // Mostrar mensaje de éxito
+            mostrarMensaje(data.message, 'success');
+
+            // Resetear cantidad
             document.getElementById('qty' + productoId).selectedIndex = 0;
 
             // Actualizar contador del carrito
@@ -314,17 +329,36 @@ function agregarAlCarrito(productoId) {
                 badge.textContent = data.carrito_items;
             }
         } else {
-            alert('Error: ' + data.message);
+            mostrarMensaje(data.message, 'error');
         }
         boton.disabled = false;
         boton.innerHTML = textoOriginal;
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error al agregar producto al carrito');
+        mostrarMensaje('Error al agregar producto al carrito', 'error');
         boton.disabled = false;
         boton.innerHTML = textoOriginal;
     });
+}
+
+function mostrarMensaje(mensaje, tipo) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-info-circle me-2"></i>
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    const main = document.querySelector('main .container');
+    main.insertBefore(alertDiv, main.firstChild);
+
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
 }
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 from decimal import Decimal
+import uuid
 
 
 class Categoria(models.Model):
@@ -25,8 +28,8 @@ class Producto(models.Model):
 
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_oferta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio = models.CharField(max_length=20, help_text="Precio como texto")
+    precio_oferta = models.CharField(max_length=20, null=True, blank=True, help_text="Precio de oferta como texto")
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     stock = models.PositiveIntegerField(default=0)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
@@ -44,12 +47,30 @@ class Producto(models.Model):
 
     def precio_actual(self):
         """Retorna el precio con oferta si existe, sino el precio normal"""
-        return self.precio_oferta if self.precio_oferta else self.precio
+        if self.precio_oferta:
+            try:
+                return Decimal(self.precio_oferta)
+            except:
+                pass
+        try:
+            return Decimal(self.precio)
+        except:
+            return Decimal('0.00')
+
+    def precio_actual_str(self):
+        """Retorna el precio actual como string para mostrar"""
+        return str(self.precio_actual())
 
     def descuento_porcentaje(self):
         """Calcula el porcentaje de descuento si hay precio de oferta"""
-        if self.precio_oferta and self.precio_oferta < self.precio:
-            return int(((self.precio - self.precio_oferta) / self.precio) * 100)
+        if self.precio_oferta:
+            try:
+                precio_normal = Decimal(self.precio)
+                precio_oferta = Decimal(self.precio_oferta)
+                if precio_oferta < precio_normal:
+                    return int(((precio_normal - precio_oferta) / precio_normal) * 100)
+            except:
+                pass
         return 0
 
     def en_stock(self):
@@ -122,11 +143,44 @@ class ItemCarrito(models.Model):
 
     def subtotal(self):
         """Calcula el subtotal del item (precio x cantidad)"""
-        return self.producto.precio_actual() * self.cantidad
+        precio_actual = self.producto.precio_actual()
+        return precio_actual * self.cantidad
 
     def puede_aumentar_cantidad(self):
         """Verifica si se puede aumentar la cantidad basado en el stock"""
         return self.cantidad < self.producto.stock
+
+
+class TokenRecuperacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=100, unique=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    usado = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Token para {self.usuario.username}"
+
+    def es_valido(self):
+        """Verifica si el token es válido (no expirado y no usado)"""
+        if self.usado:
+            return False
+        # Token expira en 1 hora
+        expiracion = self.fecha_creacion + timedelta(hours=1)
+        return timezone.now() < expiracion
+
+    @classmethod
+    def crear_token(cls, usuario):
+        """Crea un nuevo token para el usuario"""
+        # Eliminar tokens anteriores del usuario
+        cls.objects.filter(usuario=usuario).delete()
+
+        # Crear nuevo token
+        token = str(uuid.uuid4())
+        return cls.objects.create(usuario=usuario, token=token)
+
+    class Meta:
+        verbose_name = "Token de Recuperación"
+        verbose_name_plural = "Tokens de Recuperación"
 
 
 # Señales para crear perfil y carrito automáticamente

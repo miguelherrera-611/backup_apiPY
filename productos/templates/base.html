@@ -236,7 +236,29 @@
             box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
         }
 
-        /* Estilos del Carrito */
+        /* Toggle de modo claro/oscuro - Posicionado en el navbar */
+        .theme-toggle {
+            background: var(--gaming-purple);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Estilos del Carrito MEJORADOS */
         .carrito-icon {
             position: relative;
             color: var(--gaming-neon);
@@ -280,17 +302,17 @@
             top: 100%;
             right: 0;
             background: linear-gradient(145deg, var(--gaming-dark), var(--gaming-gray));
-            border: 1px solid var(--gaming-purple);
+            border: 2px solid var(--gaming-purple);
             border-radius: 15px;
             box-shadow:
-                0 10px 30px rgba(139, 92, 246, 0.3),
-                0 0 20px rgba(192, 132, 252, 0.2);
-            width: 350px;
-            max-height: 400px;
-            overflow-y: auto;
+                0 15px 35px rgba(139, 92, 246, 0.4),
+                0 0 30px rgba(192, 132, 252, 0.3);
+            width: 380px;
+            max-height: 500px;
             z-index: 1000;
             display: none;
             backdrop-filter: blur(20px);
+            overflow: hidden;
         }
 
         .carrito-dropdown.show {
@@ -303,15 +325,67 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .carrito-item {
-            padding: 15px;
-            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
-            transition: background-color 0.3s ease;
+        .carrito-header {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
             color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .carrito-items-container {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0;
+            /* ESTILOS CRÍTICOS PARA EL SCROLL */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gaming-purple) var(--gaming-dark);
+        }
+
+        .carrito-items-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .carrito-items-container::-webkit-scrollbar-track {
+            background: var(--gaming-dark);
+            border-radius: 4px;
+        }
+
+        .carrito-items-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            border-radius: 4px;
+        }
+
+        .carrito-items-container::-webkit-scrollbar-thumb:hover {
+            background: var(--gaming-neon);
+        }
+
+
+        .carrito-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            /* IMPORTANTE: Asegurar que los items no se compriman */
+            flex-shrink: 0;
+            min-height: 80px;
         }
 
         .carrito-item:hover {
             background-color: rgba(139, 92, 246, 0.1);
+            transform: translateX(5px);
+        }
+
+        .carrito-item:last-child {
+            border-bottom: none;
         }
 
         .carrito-item-img {
@@ -319,7 +393,112 @@
             height: 50px;
             object-fit: cover;
             border-radius: 8px;
-            border: 1px solid var(--gaming-purple);
+            border: 2px solid var(--gaming-purple);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+
+        .carrito-item-placeholder {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--gaming-gray), var(--gaming-dark));
+            border-radius: 8px;
+            border: 2px solid var(--gaming-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gaming-neon);
+        }
+
+        .carrito-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .carrito-item-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--gaming-neon);
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .carrito-item-details {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .carrito-item-price {
+            font-weight: 600;
+            color: var(--gaming-success);
+        }
+
+        .carrito-item-quantity {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--gaming-neon);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .carrito-item-remove {
+            background: none;
+            border: none;
+            color: var(--gaming-danger);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carrito-item-remove:hover {
+            background: var(--gaming-danger);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .carrito-footer {
+            background: rgba(26, 26, 26, 0.9);
+            padding: 15px 20px;
+            border-top: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .carrito-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .carrito-total-label {
+            color: white;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .carrito-total-amount {
+            color: var(--gaming-success);
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .carrito-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         .btn-carrito {
@@ -327,15 +506,59 @@
             border: none;
             color: white;
             border-radius: 20px;
-            padding: 8px 16px;
+            padding: 10px 16px;
             font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .btn-carrito:hover {
             transform: scale(1.05);
             color: white;
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-carrito-danger {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+        }
+
+        .btn-carrito-danger:hover {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .carrito-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .carrito-empty-icon {
+            font-size: 3rem;
+            color: rgba(139, 92, 246, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .carrito-loading {
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--gaming-neon);
+        }
+
+        .carrito-more-items {
+            padding: 10px 20px;
+            text-align: center;
+            background: rgba(139, 92, 246, 0.1);
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+            color: var(--gaming-neon);
+            font-size: 12px;
+            font-weight: 600;
         }
 
         /* Dropdown menu gaming */
@@ -538,6 +761,176 @@
         .card .bg-warning, .card .bg-danger {
             color: inherit !important;
         }
+
+        /* ============== MODO CLARO - SOLO SE APLICA CUANDO TIENE LA CLASE light-mode ============== */
+
+        /* MODO CLARO - Solo cuando body tiene clase light-mode */
+        body.light-mode {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #e3f2fd 100%) !important;
+            color: #212529 !important;
+        }
+
+        body.light-mode::before {
+            background: none !important;
+        }
+
+        body.light-mode .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 2px solid var(--gaming-purple) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-mode .card {
+            background: #ffffff !important;
+            border: 1px solid #e9ecef !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-mode .card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        body.light-mode .hero-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(255, 255, 255, 0.9)) !important;
+            border: 2px solid var(--gaming-purple) !important;
+        }
+
+        body.light-mode .stats-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), #ffffff) !important;
+            border: 1px solid #e9ecef !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-mode .carrito-dropdown {
+            background: #ffffff !important;
+            border: 2px solid var(--gaming-purple) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        body.light-mode .dropdown-menu {
+            background: #ffffff !important;
+            border: 2px solid var(--gaming-purple) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        body.light-mode .form-control {
+            background: #ffffff !important;
+            border: 1px solid #ced4da !important;
+            color: #212529 !important;
+        }
+
+        body.light-mode .form-control:focus {
+            background: #ffffff !important;
+            border-color: var(--gaming-purple) !important;
+            color: #212529 !important;
+        }
+
+        body.light-mode .form-control::placeholder {
+            color: #6c757d !important;
+        }
+
+        body.light-mode .alert-success {
+            background: rgba(16, 185, 129, 0.1) !important;
+            border: 1px solid var(--gaming-success) !important;
+            color: var(--gaming-success) !important;
+        }
+
+        body.light-mode .alert-danger {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border: 1px solid var(--gaming-danger) !important;
+            color: var(--gaming-danger) !important;
+        }
+
+        body.light-mode .table-dark {
+            background: #ffffff !important;
+            border: 1px solid #e9ecef !important;
+        }
+
+        body.light-mode .pagination .page-link {
+            background: #ffffff !important;
+            border: 2px solid var(--gaming-purple) !important;
+            color: #212529 !important;
+        }
+
+        body.light-mode .carrito-footer {
+            background: #f8f9fa !important;
+        }
+
+        body.light-mode .carrito-header {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+        }
+
+        body.light-mode .carrito-item {
+            border-bottom-color: rgba(139, 92, 246, 0.2) !important;
+        }
+
+        body.light-mode .carrito-item:hover {
+            background-color: rgba(139, 92, 246, 0.05) !important;
+        }
+
+        body.light-mode .carrito-more-items {
+            background: rgba(139, 92, 246, 0.05) !important;
+        }
+
+        /* MODO CLARO - Forzar texto OSCURO */
+        body.light-mode * {
+            color: #212529 !important;
+        }
+
+        /* Excepciones para botones y badges en modo claro */
+        body.light-mode .btn-primary,
+        body.light-mode .btn-success,
+        body.light-mode .btn-danger,
+        body.light-mode .btn-warning,
+        body.light-mode .badge,
+        body.light-mode .bg-primary,
+        body.light-mode .bg-success,
+        body.light-mode .bg-danger,
+        body.light-mode .bg-warning,
+        body.light-mode .bg-info,
+        body.light-mode .carrito-header,
+        body.light-mode .carrito-badge,
+        body.light-mode .btn-carrito {
+            color: #ffffff !important;
+        }
+
+        body.light-mode h1,
+        body.light-mode h2,
+        body.light-mode h3,
+        body.light-mode h4,
+        body.light-mode h5,
+        body.light-mode h6 {
+            text-shadow: none !important;
+            color: var(--gaming-purple) !important;
+        }
+
+        body.light-mode .navbar-brand {
+            color: var(--gaming-purple) !important;
+        }
+
+        body.light-mode .text-primary {
+            color: var(--gaming-purple) !important;
+        }
+
+        body.light-mode .carrito-icon {
+            color: var(--gaming-purple) !important;
+        }
+
+        body.light-mode .carrito-item-name {
+            color: var(--gaming-purple) !important;
+        }
+
+        body.light-mode .carrito-total-amount {
+            color: var(--gaming-success) !important;
+        }
+
+        body.light-mode .carrito-item-price {
+            color: var(--gaming-success) !important;
+        }
+
+        body.light-mode .carrito-item-quantity {
+            color: var(--gaming-purple) !important;
+        }
     </style>
 </head>
 <body>
@@ -549,8 +942,13 @@
                 <span class="text-primary">GAMERLY</span>
             </a>
 
-            <!-- AQUÍ ESTÁ LA PARTE ACTUALIZADA CON REGISTRO Y PERFIL -->
             <div class="navbar-nav ms-auto d-flex align-items-center">
+                <!-- Toggle de tema integrado en el navbar -->
+                <button class="theme-toggle me-3" onclick="toggleTheme()" id="themeToggle">
+                    <i class="fas fa-sun" id="themeIcon"></i>
+                    <span id="themeText">Modo Claro</span>
+                </button>
+
                 {% if user.is_authenticated %}
                     <!-- Carrito (solo para clientes) -->
                     {% if not user.is_superuser %}
@@ -563,27 +961,31 @@
                                 </span>
                             </div>
 
-                            <!-- Dropdown del carrito -->
+                            <!-- Dropdown del carrito MEJORADO -->
                             <div class="carrito-dropdown" id="carritoDropdown">
-                                <div class="p-3 border-bottom bg-primary text-white text-center">
-                                    <h6 class="mb-0">
-                                        <i class="fas fa-shopping-cart me-2"></i>Mi Carrito
-                                    </h6>
+                                <div class="carrito-header">
+                                    <i class="fas fa-shopping-cart me-2"></i>Mi Carrito
                                 </div>
-                                <div id="carritoItems">
+
+                                <div class="carrito-items-container" id="carritoItems">
                                     <!-- Los items se cargarán aquí via JavaScript -->
-                                </div>
-                                <div class="p-3 border-top">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <strong>Total: </strong>
-                                        <strong id="carritoTotal">$0.00</strong>
+                                    <div class="carrito-loading">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <div>Cargando...</div>
                                     </div>
-                                    <div class="d-grid gap-2">
-                                        <a href="{% url 'ver_carrito' %}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Ver Carrito
+                                </div>
+
+                                <div class="carrito-footer">
+                                    <div class="carrito-total">
+                                        <span class="carrito-total-label">Total:</span>
+                                        <span class="carrito-total-amount" id="carritoTotal">$0.00</span>
+                                    </div>
+                                    <div class="carrito-actions">
+                                        <a href="{% url 'ver_carrito' %}" class="btn-carrito">
+                                            <i class="fas fa-eye"></i>Ver Carrito
                                         </a>
-                                        <button class="btn btn-outline-danger btn-sm" onclick="limpiarCarrito()">
-                                            <i class="fas fa-trash me-1"></i>Limpiar
+                                        <button class="btn-carrito btn-carrito-danger" onclick="limpiarCarrito()">
+                                            <i class="fas fa-trash"></i>Limpiar
                                         </button>
                                     </div>
                                 </div>
@@ -675,7 +1077,46 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Scripts del Carrito -->
+    <!-- Script del Toggle de Tema -->
+    <script>
+        // Función para toggle del tema
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            body.classList.toggle('light-mode');
+
+            if (body.classList.contains('light-mode')) {
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Modo Oscuro';
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Modo Claro';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Cargar tema guardado al inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (savedTheme === 'light') {
+                body.classList.add('light-mode');
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Modo Oscuro';
+            } else {
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Modo Claro';
+            }
+        });
+    </script>
+
+    <!-- Scripts del Carrito MEJORADO -->
     {% if user.is_authenticated and not user.is_superuser %}
     <script>
         let carritoAbierto = false;
@@ -686,7 +1127,7 @@
 
             if (carritoAbierto) {
                 dropdown.classList.add('show');
-                cargarCarrito();
+                cargarCarritoItems();
             } else {
                 dropdown.classList.remove('show');
             }
@@ -701,15 +1142,128 @@
             }
         });
 
+        function cargarCarritoItems() {
+            const carritoItems = document.getElementById('carritoItems');
+            const carritoTotal = document.getElementById('carritoTotal');
+
+            // Mostrar loading
+            carritoItems.innerHTML = `
+                <div class="carrito-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <div>Cargando productos...</div>
+                </div>
+            `;
+
+            fetch('/ajax/carrito/items/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        carritoTotal.textContent = `${data.total_precio}`;
+
+                        if (data.items.length === 0) {
+                            carritoItems.innerHTML = `
+                                <div class="carrito-empty">
+                                    <div class="carrito-empty-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div>Tu carrito está vacío</div>
+                                    <small>Agrega productos para comenzar</small>
+                                </div>
+                            `;
+                        } else {
+                            let itemsHtml = '';
+
+                            data.items.forEach(item => {
+                                itemsHtml += `
+                                    <div class="carrito-item" data-item-id="${item.id}">
+                                        ${item.imagen_url ?
+                                            `<img src="${item.imagen_url}" alt="${item.nombre}" class="carrito-item-img">` :
+                                            `<div class="carrito-item-placeholder">
+                                                <i class="fas fa-image"></i>
+                                            </div>`
+                                        }
+                                        <div class="carrito-item-info">
+                                            <div class="carrito-item-name">${item.nombre}</div>
+                                            <div class="carrito-item-details">
+                                                <span class="carrito-item-price">${item.subtotal}</span>
+                                                <span class="carrito-item-quantity">x${item.cantidad}</span>
+                                            </div>
+                                        </div>
+                                        <button class="carrito-item-remove" onclick="eliminarItemCarrito(${item.id})" title="Eliminar">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                `;
+                            });
+
+
+
+                            carritoItems.innerHTML = itemsHtml;
+                        }
+                    } else {
+                        carritoItems.innerHTML = `
+                            <div class="carrito-empty">
+                                <div class="carrito-empty-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>Error al cargar el carrito</div>
+                                <small>${data.message}</small>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    carritoItems.innerHTML = `
+                        <div class="carrito-empty">
+                            <div class="carrito-empty-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>Error de conexión</div>
+                            <small>No se pudo cargar el carrito</small>
+                        </div>
+                    `;
+                });
+        }
+
+        function eliminarItemCarrito(itemId) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (!csrfToken) {
+                console.error('CSRF token no encontrado');
+                return;
+            }
+
+            fetch(`/ajax/carrito/eliminar/${itemId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar badge del carrito
+                    document.getElementById('carritoBadge').textContent = data.carrito_items;
+
+                    // Recargar items del carrito
+                    cargarCarritoItems();
+
+                    mostrarMensaje(data.message, 'success');
+                } else {
+                    mostrarMensaje(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarMensaje('Error al eliminar producto del carrito', 'error');
+            });
+        }
+
         function cargarCarrito() {
             fetch('/api/carrito-info/')
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('carritoBadge').textContent = data.total_items || 0;
-                    document.getElementById('carritoTotal').textContent = `$${data.total_precio || 0}`;
-
-                    // Aquí podrías cargar los items del carrito si tienes un endpoint para eso
-                    // Por ahora solo actualizamos el contador y total
                 })
                 .catch(error => console.error('Error:', error));
         }
@@ -743,7 +1297,7 @@
 
                     // Recargar carrito si está abierto
                     if (carritoAbierto) {
-                        cargarCarrito();
+                        cargarCarritoItems();
                     }
                 } else {
                     mostrarMensaje(data.message, 'error');
@@ -776,9 +1330,8 @@
                         document.getElementById('carritoBadge').textContent = '0';
                         document.getElementById('carritoTotal').textContent = '$0.00';
 
-                        // Cerrar dropdown
-                        document.getElementById('carritoDropdown').classList.remove('show');
-                        carritoAbierto = false;
+                        // Recargar items del carrito
+                        cargarCarritoItems();
 
                         mostrarMensaje(data.message, 'success');
                     } else {

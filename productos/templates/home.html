@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Inicio - Mi Tienda{% endblock %}
+{% block title %}Inicio - GAMERLY{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <div class="hero-section">
     <h1 class="display-4 fw-bold mb-4">
         <i class="fas fa-rocket me-3"></i>
-        Bienvenido a Mi Tienda
+        Bienvenido a GAMERLY
     </h1>
     <p class="lead mb-4">
-        Descubre productos increíbles con la mejor tecnología Django
+        "Juega mejor. Vive Gamerly" - Descubre productos gaming increíbles con la mejor tecnología
     </p>
     {% if not user.is_authenticated %}
         <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
@@ -48,72 +48,554 @@
     </div>
 </div>
 
-<!-- Productos Destacados -->
-<div class="row">
-    <div class="col-12">
-        <h2 class="text-white text-center mb-5">
-            <i class="fas fa-fire me-2"></i>
+<!-- CARRUSEL DE PRODUCTOS DESTACADOS -->
+{% if productos_destacados %}
+    <!-- CSS específico para el carrusel -->
+    <style>
+        /* CARRUSEL GAMING PRINCIPAL */
+        .gaming-carousel-container {
+            position: relative;
+            margin: 50px 0;
+            padding: 40px 0;
+            overflow: hidden;
+        }
+
+        .gaming-carousel-title {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .gaming-carousel-title h2 {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: var(--gaming-neon);
+            text-shadow:
+                0 0 20px var(--gaming-neon),
+                0 0 40px var(--gaming-purple),
+                0 0 60px var(--gaming-purple);
+            margin-bottom: 20px;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        .gaming-carousel-title::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: conic-gradient(from 0deg, transparent, var(--gaming-neon), transparent);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: rotate 8s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes titleGlow {
+            from {
+                text-shadow:
+                    0 0 20px var(--gaming-neon),
+                    0 0 40px var(--gaming-purple);
+            }
+            to {
+                text-shadow:
+                    0 0 30px var(--gaming-neon),
+                    0 0 60px var(--gaming-purple),
+                    0 0 80px var(--gaming-accent);
+            }
+        }
+
+        @keyframes rotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* CARRUSEL WRAPPER */
+        .carousel-wrapper {
+            position: relative;
+            overflow: hidden;
+            padding: 20px 0;
+            border-radius: 25px;
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.5), rgba(42, 42, 42, 0.3));
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+            gap: 30px;
+            padding: 0 30px;
+        }
+
+        /* PRODUCTO CARD GAMING */
+        .producto-card {
+            min-width: 320px;
+            width: 320px;
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.9));
+            border: 2px solid var(--gaming-purple);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            backdrop-filter: blur(15px);
+            box-shadow:
+                0 10px 30px rgba(139, 92, 246, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .producto-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+
+        .producto-card:hover::before {
+            left: 100%;
+        }
+
+        .producto-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: var(--gaming-neon);
+            box-shadow:
+                0 25px 50px rgba(139, 92, 246, 0.5),
+                0 0 30px rgba(192, 132, 252, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* IMAGEN DEL PRODUCTO */
+        .producto-image-container {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            background: linear-gradient(45deg, rgba(139, 92, 246, 0.1), rgba(26, 26, 26, 0.8));
+        }
+
+        .producto-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .producto-card:hover .producto-image {
+            transform: scale(1.1);
+            filter: brightness(1.1) saturate(1.2);
+        }
+
+        .producto-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, var(--gaming-gray), var(--gaming-dark));
+            color: var(--gaming-neon);
+            font-size: 3rem;
+        }
+
+        /* BADGES SUPERIORES */
+        .producto-badges {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 3;
+        }
+
+        .badge-left, .badge-right {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .producto-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: badgePulse 2s ease-in-out infinite alternate;
+        }
+
+        .badge-destacado {
+            background: linear-gradient(45deg, var(--gaming-warning), #d97706);
+            color: white;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+        }
+
+        .badge-descuento {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+
+        .badge-disponible {
+            background: linear-gradient(45deg, var(--gaming-success), #059669);
+            color: white;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+        }
+
+        .badge-agotado {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes badgePulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        /* CONTENIDO DEL PRODUCTO */
+        .producto-content {
+            padding: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .producto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .producto-titulo {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--gaming-neon);
+            margin: 0;
+            text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+            line-height: 1.3;
+            max-width: 200px;
+        }
+
+        .categoria-badge {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+        }
+
+        .producto-descripcion {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            height: 60px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        /* PRECIOS */
+        .producto-precios {
+            margin-bottom: 20px;
+        }
+
+        .precio-normal {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: line-through;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .precio-actual {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--gaming-success);
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .precio-oferta-badge {
+            background: linear-gradient(45deg, var(--gaming-success), #059669);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        /* INFORMACIÓN ADICIONAL */
+        .producto-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(139, 92, 246, 0.3);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stock-info, .fecha-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* CONTROLES DEL CARRUSEL */
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .carousel-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow:
+                0 8px 25px rgba(139, 92, 246, 0.4),
+                0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .carousel-btn:hover {
+            transform: scale(1.1);
+            background: linear-gradient(45deg, var(--gaming-neon), var(--gaming-accent));
+            box-shadow:
+                0 12px 35px rgba(139, 92, 246, 0.6),
+                0 0 30px rgba(192, 132, 252, 0.5);
+        }
+
+        .carousel-btn:active {
+            transform: scale(0.95);
+        }
+
+        .carousel-btn-prev {
+            left: -30px;
+        }
+
+        .carousel-btn-next {
+            right: -30px;
+        }
+
+        /* INDICADORES */
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .indicator.active {
+            background: var(--gaming-neon);
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.7);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.3);
+        }
+
+        .indicator:hover {
+            background: var(--gaming-purple-light);
+            transform: scale(1.2);
+        }
+
+        /* AUTO-PLAY PROGRESS */
+        .autoplay-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gaming-purple), var(--gaming-neon));
+            border-radius: 2px;
+            transition: width 0.1s linear;
+            opacity: 0.7;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .gaming-carousel-title h2 {
+                font-size: 2rem;
+            }
+
+            .producto-card {
+                min-width: 280px;
+                width: 280px;
+            }
+
+            .carousel-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .carousel-btn-prev {
+                left: -25px;
+            }
+
+            .carousel-btn-next {
+                right: -25px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .producto-card {
+                min-width: 260px;
+                width: 260px;
+            }
+
+            .carousel-track {
+                padding: 0 20px;
+                gap: 20px;
+            }
+        }
+    </style>
+
+    <!-- Título del carrusel -->
+    <div class="gaming-carousel-title">
+        <h2>
+            <i class="fas fa-fire me-3"></i>
             Productos Destacados
         </h2>
     </div>
-</div>
 
-{% if productos_destacados %}
-    <div class="row">
-        {% for producto in productos_destacados %}
-            <div class="col-md-4 mb-4">
-                <div class="card product-card h-100">
-                    {% if producto.imagen %}
-                        <img src="{{ producto.imagen.url }}" class="card-img-top product-image" alt="{{ producto.nombre }}">
-                    {% else %}
-                        <div class="product-image bg-light d-flex align-items-center justify-content-center">
-                            <i class="fas fa-image fa-3x text-muted"></i>
-                        </div>
-                    {% endif %}
-
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ producto.nombre }}</h5>
-                        <p class="card-text flex-grow-1">{{ producto.descripcion|truncatewords:15 }}</p>
-
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <div>
-                                {% if producto.precio_oferta %}
-                                    <span class="text-muted text-decoration-line-through">${{ producto.precio }}</span>
-                                    <span class="fw-bold text-success fs-5">${{ producto.precio_oferta }}</span>
-                                    <span class="badge bg-danger">-{{ producto.descuento_porcentaje }}%</span>
-                                {% else %}
-                                    <span class="fw-bold text-primary fs-5">${{ producto.precio }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <span class="badge bg-info">{{ producto.categoria.nombre }}</span>
-                                {% if producto.destacado %}
-                                    <span class="badge bg-warning text-dark">
-                                        <i class="fas fa-star"></i>
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="mt-3">
-                            {% if producto.en_stock %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check me-1"></i>En Stock ({{ producto.stock }})
-                                </span>
+    <!-- Container del carrusel -->
+    <div class="gaming-carousel-container">
+        <div class="carousel-wrapper" id="carouselWrapper">
+            <div class="carousel-track" id="carouselTrack">
+                {% for producto in productos_destacados %}
+                    <a href="{% url 'detalle_producto' producto.id %}" class="producto-card">
+                        <div class="producto-image-container">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}"
+                                     alt="{{ producto.nombre }}" class="producto-image">
                             {% else %}
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-times me-1"></i>Agotado
-                                </span>
+                                <div class="producto-image-placeholder">
+                                    <i class="fas fa-image"></i>
+                                </div>
                             {% endif %}
+
+                            <div class="producto-badges">
+                                <div class="badge-left">
+                                    {% if producto.destacado %}
+                                        <span class="producto-badge badge-destacado">
+                                            <i class="fas fa-star me-1"></i>Destacado
+                                        </span>
+                                    {% endif %}
+                                    {% if producto.descuento_porcentaje > 0 %}
+                                        <span class="producto-badge badge-descuento">
+                                            -{{ producto.descuento_porcentaje }}%
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="badge-right">
+                                    {% if producto.en_stock %}
+                                        <span class="producto-badge badge-disponible">
+                                            <i class="fas fa-check me-1"></i>Disponible
+                                        </span>
+                                    {% else %}
+                                        <span class="producto-badge badge-agotado">
+                                            <i class="fas fa-times me-1"></i>Agotado
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+
+                        <div class="producto-content">
+                            <div class="producto-header">
+                                <h3 class="producto-titulo">{{ producto.nombre }}</h3>
+                                <span class="categoria-badge">{{ producto.categoria.nombre }}</span>
+                            </div>
+
+                            <p class="producto-descripcion">
+                                {{ producto.descripcion|truncatewords:12 }}
+                            </p>
+
+                            <div class="producto-precios">
+                                {% if producto.precio_oferta %}
+                                    <span class="precio-normal">${{ producto.precio }}</span>
+                                    <span class="precio-actual">${{ producto.precio_oferta }}</span>
+                                    <span class="precio-oferta-badge">OFERTA</span>
+                                {% else %}
+                                    <span class="precio-actual">${{ producto.precio }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="producto-info">
+                                <span class="stock-info">
+                                    <i class="fas fa-boxes"></i>
+                                    Stock: {{ producto.stock }}
+                                </span>
+                                <span class="fecha-info">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ producto.fecha_creacion|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
             </div>
-        {% endfor %}
+
+            <!-- Controles del carrusel -->
+            <button class="carousel-controls carousel-btn carousel-btn-prev" id="prevBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-controls carousel-btn carousel-btn-next" id="nextBtn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Barra de progreso del autoplay -->
+            <div class="autoplay-progress" id="autoplayProgress"></div>
+        </div>
+
+        <!-- Indicadores -->
+        <div class="carousel-indicators" id="carouselIndicators"></div>
     </div>
+
 {% else %}
-    <div class="text-center">
+    <!-- Estado vacío -->
+    <div class="text-center py-5">
         <div class="card p-5">
             <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
             <h3 class="text-muted">No hay productos destacados</h3>
@@ -140,4 +622,294 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+class GamingCarousel {
+    constructor() {
+        this.track = document.getElementById('carouselTrack');
+        this.prevBtn = document.getElementById('prevBtn');
+        this.nextBtn = document.getElementById('nextBtn');
+        this.indicators = document.getElementById('carouselIndicators');
+        this.autoplayProgress = document.getElementById('autoplayProgress');
+
+        if (!this.track) return; // No hay carrusel si no hay productos
+
+        this.cards = Array.from(this.track.children);
+        this.currentIndex = 0;
+        this.cardsToShow = this.getCardsToShow();
+        this.maxIndex = Math.max(0, this.cards.length - this.cardsToShow);
+
+        this.autoplayInterval = null;
+        this.autoplayDuration = 5000; // 5 segundos
+        this.progressInterval = null;
+
+        this.isAnimating = false;
+        this.isHovered = false;
+
+        this.init();
+    }
+
+    init() {
+        this.setupIndicators();
+        this.setupEventListeners();
+        this.updateCarousel();
+        this.startAutoplay();
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            this.cardsToShow = this.getCardsToShow();
+            this.maxIndex = Math.max(0, this.cards.length - this.cardsToShow);
+            this.currentIndex = Math.min(this.currentIndex, this.maxIndex);
+            this.updateCarousel();
+            this.setupIndicators();
+        });
+    }
+
+    getCardsToShow() {
+        const containerWidth = this.track.parentElement.offsetWidth;
+        const cardWidth = 320 + 30; // ancho de card + gap
+        return Math.floor((containerWidth - 60) / cardWidth); // 60px para padding
+    }
+
+    setupIndicators() {
+        this.indicators.innerHTML = '';
+        const indicatorCount = this.maxIndex + 1;
+
+        for (let i = 0; i < indicatorCount; i++) {
+            const indicator = document.createElement('div');
+            indicator.className = 'indicator';
+            indicator.addEventListener('click', () => this.goToSlide(i));
+            this.indicators.appendChild(indicator);
+        }
+
+        this.updateIndicators();
+    }
+
+    setupEventListeners() {
+        this.prevBtn.addEventListener('click', () => this.prevSlide());
+        this.nextBtn.addEventListener('click', () => this.nextSlide());
+
+        // Pausar autoplay en hover
+        const carousel = document.querySelector('.carousel-wrapper');
+        carousel.addEventListener('mouseenter', () => {
+            this.isHovered = true;
+            this.stopAutoplay();
+        });
+
+        carousel.addEventListener('mouseleave', () => {
+            this.isHovered = false;
+            this.startAutoplay();
+        });
+
+        // Touch/swipe support
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        carousel.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            this.stopAutoplay();
+        });
+
+        carousel.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+        });
+
+        carousel.addEventListener('touchend', () => {
+            if (!isDragging) return;
+
+            const diff = startX - currentX;
+            const threshold = 50;
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    this.nextSlide();
+                } else {
+                    this.prevSlide();
+                }
+            }
+
+            isDragging = false;
+            if (!this.isHovered) {
+                this.startAutoplay();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                this.prevSlide();
+            } else if (e.key === 'ArrowRight') {
+                this.nextSlide();
+            }
+        });
+    }
+
+    updateCarousel() {
+        if (this.isAnimating) return;
+
+        this.isAnimating = true;
+
+        const cardWidth = 320 + 30; // card width + gap
+        const translateX = -this.currentIndex * cardWidth;
+
+        this.track.style.transform = `translateX(${translateX}px)`;
+        this.updateIndicators();
+        this.updateButtons();
+
+        // Animation complete
+        setTimeout(() => {
+            this.isAnimating = false;
+        }, 800);
+    }
+
+    updateIndicators() {
+        const indicators = this.indicators.children;
+        Array.from(indicators).forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === this.currentIndex);
+        });
+    }
+
+    updateButtons() {
+        this.prevBtn.style.opacity = this.currentIndex === 0 ? '0.5' : '1';
+        this.nextBtn.style.opacity = this.currentIndex === this.maxIndex ? '0.5' : '1';
+    }
+
+    nextSlide() {
+        if (this.isAnimating) return;
+
+        if (this.currentIndex < this.maxIndex) {
+            this.currentIndex++;
+        } else {
+            this.currentIndex = 0; // Loop back to start
+        }
+
+        this.updateCarousel();
+        this.resetAutoplay();
+    }
+
+    prevSlide() {
+        if (this.isAnimating) return;
+
+        if (this.currentIndex > 0) {
+            this.currentIndex--;
+        } else {
+            this.currentIndex = this.maxIndex; // Loop to end
+        }
+
+        this.updateCarousel();
+        this.resetAutoplay();
+    }
+
+    goToSlide(index) {
+        if (this.isAnimating || index === this.currentIndex) return;
+
+        this.currentIndex = index;
+        this.updateCarousel();
+        this.resetAutoplay();
+    }
+
+    startAutoplay() {
+        if (this.isHovered || this.autoplayInterval) return;
+
+        this.autoplayInterval = setInterval(() => {
+            this.nextSlide();
+        }, this.autoplayDuration);
+
+        this.startProgressBar();
+    }
+
+    stopAutoplay() {
+        if (this.autoplayInterval) {
+            clearInterval(this.autoplayInterval);
+            this.autoplayInterval = null;
+        }
+
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+            this.progressInterval = null;
+        }
+
+        this.autoplayProgress.style.width = '0%';
+    }
+
+    resetAutoplay() {
+        this.stopAutoplay();
+        if (!this.isHovered) {
+            this.startAutoplay();
+        }
+    }
+
+    startProgressBar() {
+        let progress = 0;
+        const increment = 100 / (this.autoplayDuration / 50);
+
+        this.progressInterval = setInterval(() => {
+            progress += increment;
+            this.autoplayProgress.style.width = `${progress}%`;
+
+            if (progress >= 100) {
+                progress = 0;
+                this.autoplayProgress.style.width = '0%';
+            }
+        }, 50);
+    }
+}
+
+// Initialize carousel when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Solo inicializar si existe el carrusel
+    if (document.getElementById('carouselTrack')) {
+        new GamingCarousel();
+
+        // Gaming effects
+        addGamingEffects();
+    }
+});
+
+function addGamingEffects() {
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.producto-card');
+
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.zIndex = '10';
+
+            // Add glow effect
+            this.style.filter = 'drop-shadow(0 0 20px rgba(192, 132, 252, 0.6))';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.zIndex = '';
+            this.style.filter = '';
+        });
+
+        // Click effect
+        card.addEventListener('click', function() {
+            this.style.animation = 'none';
+            this.offsetHeight; // trigger reflow
+            this.style.animation = 'cardClick 0.3s ease';
+        });
+    });
+
+    // Add click animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes cardClick {
+            0% { transform: translateY(-15px) scale(1.02); }
+            50% { transform: translateY(-15px) scale(0.98); }
+            100% { transform: translateY(-15px) scale(1.02); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    console.log('🎮 GAMERLY Carousel Loaded Successfully!');
+    console.log('⚡ Gaming effects activated');
+    console.log('🚀 Autoplay enabled with 5s intervals');
+}
+</script>
 {% endblock %}
