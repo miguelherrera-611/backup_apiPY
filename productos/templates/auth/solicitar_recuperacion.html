@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Recuperar Contraseña - GAMERLY{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-envelope fa-4x text-primary mb-3"></i>
+                    <h2 class="fw-bold">Recuperar Contraseña</h2>
+                    <p class="text-muted">Te enviaremos un enlace para cambiar tu contraseña</p>
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="email_or_username" class="form-label fw-bold">
+                            <i class="fas fa-user me-2"></i>Email o Usuario
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control form-control-lg"
+                            id="email_or_username"
+                            name="email_or_username"
+                            placeholder="Tu email o nombre de usuario"
+                            required
+                            autocomplete="email"
+                        >
+                        <div class="invalid-feedback">
+                            Por favor ingresa tu email o nombre de usuario.
+                        </div>
+                        <small class="text-muted">
+                            Ingresa el email o usuario con el que te registraste
+                        </small>
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Enviar Enlace de Recuperación
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center">
+                    <p class="mb-2">¿Recordaste tu contraseña?</p>
+                    <a href="{% url 'login' %}" class="btn btn-link text-decoration-none">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Volver al Login
+                    </a>
+                </div>
+
+                <!-- Información de seguridad -->
+                <div class="card bg-light mt-4">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            Información
+                        </h6>
+                        <small class="text-muted">
+                            <ul class="list-unstyled mb-0">
+                                <li><i class="fas fa-check text-success me-2"></i>Recibirás un email con un enlace seguro</li>
+                                <li><i class="fas fa-check text-success me-2"></i>El enlace expira en 1 hora por seguridad</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Solo puedes usar el enlace una vez</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Revisa tu bandeja de spam si no lo ves</li>
+                            </ul>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Auto-focus
+document.getElementById('email_or_username').focus();
+</script>
+{% endblock %}

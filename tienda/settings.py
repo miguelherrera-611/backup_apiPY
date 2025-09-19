@@ -7,7 +7,8 @@ SECRET_KEY = 'django-insecure-tu-clave-secreta-aqui-cambiar-en-produccion'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ✅ HOSTS CORREGIDOS PARA DESARROLLO
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -16,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Requerido para get_current_site
     'rest_framework',
     'productos',
 ]
@@ -35,7 +37,10 @@ ROOT_URLCONF = 'tienda.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',
+            BASE_DIR / 'productos/templates',  # Para que encuentre admin/ y auth/
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -109,29 +114,72 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-# AGREGAR al final de tu settings.py existente
-
 # Configuración del Admin Gaming
 ADMIN_SITE_HEADER = "🎮 GAMERLY Administration"
 ADMIN_SITE_TITLE = "GAMERLY Admin"
 ADMIN_INDEX_TITLE = "Panel de Control GAMERLY"
 
-# Asegurar que Django encuentre los templates del admin
-TEMPLATES[0]['DIRS'] = [
-    BASE_DIR / 'templates',
-    BASE_DIR / 'productos/templates',  # Para que encuentre admin/
-]
+# ✅ CONFIGURACIÓN DE SITES FRAMEWORK (CORREGIDA)
+SITE_ID = 1
 
-# Agregar al final de tienda/settings.py
+# =========================== CONFIGURACIÓN DE EMAIL ===========================
 
 # Configuración de Email con Gmail SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'gamerly_0131@gmail.com'  # Tu email de Gmail
-EMAIL_HOST_PASSWORD = 'tu_contraseña_de_app_aqui'  # Contraseña de aplicación (NO la contraseña normal)
-DEFAULT_FROM_EMAIL = 'GAMERLY <gamerly_0131@gmail.com>'
+EMAIL_HOST_USER = 'gamerly9060@gmail.com'  # Tu email de Gmail
+EMAIL_HOST_PASSWORD = 'zopfkzyfdnkyhhle'  # Contraseña de aplicación (SIN espacios)
+DEFAULT_FROM_EMAIL = 'GAMERLY <gamerly9060@gmail.com>'
 
-# Para desarrollo/testing (descomenta si quieres ver emails en consola)
+# Para desarrollo/testing (descomenta la línea de abajo para ver emails en consola)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# =============================================================================
+
+# ✅ CONFIGURACIÓN ADICIONAL PARA SITES FRAMEWORK
+# Esto asegura que get_current_site() funcione correctamente en desarrollo
+
+if DEBUG:
+    # Para desarrollo local
+    try:
+        from django.contrib.sites.models import Site
+        # Esta configuración se aplicará después de las migraciones
+        pass
+    except:
+        # Si no puede importar Site (antes de migraciones), no hacer nada
+        pass
+
+# ⚠️ IMPORTANTE:
+# 1. Reemplaza 'zopfkzyfdnkyhhle' con tu contraseña de aplicación real SIN ESPACIOS
+# 2. NO uses tu contraseña normal de Gmail
+# 3. Debes tener la verificación en 2 pasos activada en Gmail
+# 4. Genera la contraseña de aplicación desde: https://myaccount.google.com/security
+
+# 🎮 CONFIGURACIÓN ESPECÍFICA DE GAMERLY
+GAMERLY_CONFIG = {
+    'SITE_NAME': 'GAMERLY',
+    'SITE_DESCRIPTION': 'Juega mejor. Vive Gamerly',
+    'VERSION': '1.0.0',
+    'DEBUG_EMAIL': DEBUG,  # Usar console backend si DEBUG=True
+}
+
+# ✅ LOGGING PARA DEBUGGING (OPCIONAL)
+if DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.core.mail': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }

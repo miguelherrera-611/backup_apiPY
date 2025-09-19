@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Iniciar Sesión - Mi Tienda{% endblock %}
+{% block title %}Iniciar Sesión - GAMERLY{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -70,6 +70,32 @@
                     </div>
                 </form>
 
+                <!-- Enlaces de recuperar contraseña -->
+                <div class="text-center mt-3">
+                    <p class="mb-2 text-muted">¿Olvidaste tu contraseña?</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'recuperar_password' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fas fa-key me-1"></i>¿La recuerdas?
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'solicitar_recuperacion_password' %}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-envelope me-1"></i>Enviar por Email
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <p class="mb-2">¿No tienes cuenta?</p>
+                    <a href="{% url 'registro' %}" class="btn btn-success">
+                        <i class="fas fa-user-plus me-1"></i>Crear Cuenta
+                    </a>
+                </div>
+
                 <div class="text-center mt-4">
                     <a href="{% url 'home' %}" class="btn btn-link text-decoration-none">
                         <i class="fas fa-arrow-left me-1"></i>
@@ -80,8 +106,6 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}
 
 {% block extra_js %}

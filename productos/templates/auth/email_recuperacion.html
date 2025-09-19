@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperación de Contraseña - GAMERLY</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #1e1b4b 100%);
+            color: #ffffff;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(26, 26, 26, 0.95);
+            border-radius: 15px;
+            border: 2px solid #8b5cf6;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(45deg, #8b5cf6, #a855f7);
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: white;
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .header .tagline {
+            color: #f0f0f0;
+            margin: 10px 0 0 0;
+            font-style: italic;
+        }
+        .content {
+            padding: 0 20px;
+        }
+        .greeting {
+            font-size: 1.2rem;
+            color: #c084fc;
+            margin-bottom: 20px;
+        }
+        .message {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(45deg, #10b981, #059669);
+            color: white !important;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .button:hover {
+            background: linear-gradient(45deg, #059669, #047857);
+        }
+        .warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .warning .icon {
+            color: #ef4444;
+            font-size: 1.2rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(139, 92, 246, 0.3);
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .footer a {
+            color: #c084fc;
+            text-decoration: none;
+        }
+        .social {
+            margin: 20px 0;
+        }
+        .social a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #8b5cf6;
+            font-size: 1.5rem;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Gaming -->
+        <div class="header">
+            <h1>🎮 GAMERLY</h1>
+            <p class="tagline">"Juega mejor. Vive Gamerly"</p>
+        </div>
+
+        <div class="content">
+            <!-- Saludo personalizado -->
+            <p class="greeting">
+                Hola {{ user.first_name|default:user.username }}, 👋
+            </p>
+
+            <!-- Mensaje principal -->
+            <div class="message">
+                <h2 style="color: #c084fc; margin-top: 0;">🔑 Recuperación de Contraseña</h2>
+                <p>
+                    Recibimos una solicitud para cambiar la contraseña de tu cuenta de GAMERLY.
+                    Si fuiste tú quien la solicitó, haz clic en el botón de abajo para crear una nueva contraseña.
+                </p>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="http://{{ domain }}/confirmar-password/{{ token }}/"
+                       class="button">
+                        🚀 Cambiar Mi Contraseña
+                    </a>
+                </div>
+
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                    O copia y pega este enlace en tu navegador:<br>
+                    <a href="http://{{ domain }}/confirmar-password/{{ token }}/"
+                       style="color: #10b981; word-break: break-all;">
+                        http://{{ domain }}/confirmar-password/{{ token }}/
+                    </a>
+                </p>
+            </div>
+
+            <!-- Advertencia de seguridad -->
+            <div class="warning">
+                <h3 style="color: #ef4444; margin-top: 0;">
+                    <span class="icon">⚠️</span> Importante - Información de Seguridad
+                </h3>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li><strong>Este enlace expira en 1 hora</strong> por motivos de seguridad</li>
+                    <li><strong>Solo puedes usarlo una vez</strong> - después se invalidará</li>
+                    <li><strong>Si no solicitaste este cambio</strong>, ignora este email</li>
+                    <li><strong>Nunca compartas este enlace</strong> con otras personas</li>
+                </ul>
+            </div>
+
+            <!-- Información adicional -->
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h3 style="color: #10b981; margin-top: 0;">
+                    💡 ¿Necesitas ayuda?
+                </h3>
+                <p>
+                    Si tienes problemas con este proceso o no solicitaste este cambio,
+                    puedes contactarnos respondiendo a este email o escribiendo a
+                    <a href="mailto:gamerly_0131@gmail.com" style="color: #10b981;">gamerly_0131@gmail.com</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3 style="color: #8b5cf6; margin: 0 0 15px 0;">🎮 GAMERLY</h3>
+            <p style="margin: 10px 0;">
+                La mejor experiencia gaming está aquí<br>
+                <em>"Juega mejor. Vive Gamerly"</em>
+            </p>
+
+            <div class="social">
+                <p style="margin: 20px 0 10px 0;">Síguenos en nuestras redes:</p>
+                <!-- Puedes agregar links reales cuando tengas redes sociales -->
+                <span style="color: #8b5cf6;">📧</span>
+                <a href="mailto:gamerly_0131@gmail.com">gamerly_0131@gmail.com</a>
+            </div>
+
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 20px;">
+                Este email fue enviado automáticamente. Por favor no respondas directamente a este mensaje.<br>
+                © 2025 GAMERLY - Todos los derechos reservados
+            </p>
+        </div>
+    </div>
+</body>
+</html>

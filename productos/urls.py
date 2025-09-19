@@ -19,8 +19,12 @@ urlpatterns = [
     # Detalle de producto
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
 
-    # Recuperar contraseña
+    # Recuperar contraseña (método anterior)
     path('recuperar-password/', views.recuperar_password_view, name='recuperar_password'),
+
+    # Recuperación de contraseña por email (NUEVO)
+    path('recuperar-password-email/', views.solicitar_recuperacion_password, name='solicitar_recuperacion_password'),
+    path('confirmar-password/<str:token>/', views.confirmar_recuperacion_password, name='confirmar_recuperacion_password'),
 
     # AJAX para admin
     path('ajax/crear-producto/', views.crear_producto, name='crear_producto'),

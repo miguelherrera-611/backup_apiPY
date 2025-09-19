@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Cambiar Contraseña - GAMERLY{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-key fa-4x text-success mb-3"></i>
+                    <h2 class="fw-bold">Cambiar Contraseña</h2>
+                    <p class="text-muted">
+                        Hola <strong>{{ usuario.first_name|default:usuario.username }}</strong>, 
+                        crea tu nueva contraseña
+                    </p>
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="new_password1" class="form-label fw-bold">
+                            <i class="fas fa-lock me-2"></i>Nueva Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input
+                                type="password"
+                                class="form-control form-control-lg"
+                                id="new_password1"
+                                name="new_password1"
+                                placeholder="Tu nueva contraseña"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <button
+                                class="btn btn-outline-secondary"
+                                type="button"
+                                onclick="togglePasswordVisibility('new_password1', 'newIcon1')"
+                            >
+                                <i class="fas fa-eye" id="newIcon1"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor ingresa una nueva contraseña.
+                        </div>
+                        <small class="text-muted">Mínimo 8 caracteres con letras y números</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="new_password2" class="form-label fw-bold">
+                            <i class="fas fa-lock me-2"></i>Confirmar Nueva Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input
+                                type="password"
+                                class="form-control form-control-lg"
+                                id="new_password2"
+                                name="new_password2"
+                                placeholder="Confirma tu nueva contraseña"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <button
+                                class="btn btn-outline-secondary"
+                                type="button"
+                                onclick="togglePasswordVisibility('new_password2', 'newIcon2')"
+                            >
+                                <i class="fas fa-eye" id="newIcon2"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Las contraseñas deben coincidir.
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save me-2"></i>
+                            Cambiar Contraseña
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center">
+                    <a href="{% url 'login' %}" class="btn btn-link text-decoration-none">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Volver al Login
+                    </a>
+                </div>
+
+                <!-- Información de seguridad -->
+                <div class="card bg-light mt-4">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            Información de Seguridad
+                        </h6>
+                        <small class="text-muted">
+                            <ul class="list-unstyled mb-0">
+                                <li><i class="fas fa-check text-success me-2"></i>Tu nueva contraseña debe tener al menos 8 caracteres</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Incluye números y letras para mayor seguridad</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Esta acción cerrará todas las sesiones activas</li>
+                                <li><i class="fas fa-check text-success me-2"></i>El enlace se invalidará después de usar</li>
+                            </ul>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                // Validar que las nuevas contraseñas coincidan
+                const newPassword1 = document.getElementById('new_password1').value;
+                const newPassword2 = document.getElementById('new_password2').value;
+                
+                if (newPassword1 !== newPassword2) {
+                    document.getElementById('new_password2').setCustomValidity('Las contraseñas no coinciden');
+                } else {
+                    document.getElementById('new_password2').setCustomValidity('');
+                }
+
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Mostrar/ocultar contraseñas
+function togglePasswordVisibility(inputId, iconId) {
+    const passwordInput = document.getElementById(inputId);
+    const toggleIcon = document.getElementById(iconId);
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+// Validación en tiempo real de contraseñas
+document.getElementById('new_password2').addEventListener('input', function() {
+    const newPassword1 = document.getElementById('new_password1').value;
+    const newPassword2 = this.value;
+    
+    if (newPassword1 !== newPassword2) {
+        this.setCustomValidity('Las contraseñas no coinciden');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+
+// Auto-focus en el primer campo
+document.getElementById('new_password1').focus();
+</script>
+{% endblock %}

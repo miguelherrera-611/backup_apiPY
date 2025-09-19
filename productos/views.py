@@ -6,13 +6,17 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 import json
 
-from .models import Producto, Categoria, PerfilUsuario, Carrito, ItemCarrito
+from .models import Producto, Categoria, PerfilUsuario, Carrito, ItemCarrito, TokenRecuperacion
 from .serializers import (
     ProductoSerializer, ProductoListSerializer,
     CategoriaSerializer, PerfilUsuarioSerializer
@@ -605,6 +609,222 @@ def cambiar_password(request):
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
 
+# ====================== RECUPERACIÓN DE CONTRASEÑA POR EMAIL ======================
+
+def solicitar_recuperacion_password(request):
+    """Vista para solicitar recuperación de contraseña por email - CON DEBUGGING"""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        email_or_username = request.POST.get('email_or_username')
+
+        # 🔍 DEBUGGING AGREGADO
+        print(f"🔍 DEBUG WEB: Formulario recibido con: '{email_or_username}'")
+
+        if not email_or_username:
+            messages.error(request, 'Por favor ingresa tu email o nombre de usuario')
+            return render(request, 'auth/solicitar_recuperacion.html')
+
+        try:
+            # Buscar usuario por email o username
+            try:
+                if '@' in email_or_username:
+                    user = User.objects.get(email=email_or_username)
+                    print(f"✅ DEBUG WEB: Usuario encontrado por EMAIL: {user.username} - {user.email}")
+                else:
+                    user = User.objects.get(username=email_or_username)
+                    print(f"✅ DEBUG WEB: Usuario encontrado por USERNAME: {user.username} - {user.email}")
+            except User.DoesNotExist:
+                print(f"❌ DEBUG WEB: Usuario NO encontrado: '{email_or_username}'")
+                # Por seguridad, no revelamos si el usuario existe o no
+                messages.success(request, 'Si el usuario existe, se ha enviado un email con instrucciones.')
+                return render(request, 'auth/solicitar_recuperacion.html')
+
+            # 🔍 DEBUGGING: Verificar email
+            if not user.email:
+                print(f"❌ DEBUG WEB: Usuario {user.username} sin email")
+                messages.error(request, 'Este usuario no tiene email configurado.')
+                return render(request, 'auth/solicitar_recuperacion.html')
+
+            print(f"📧 DEBUG WEB: Email destino: {user.email}")
+
+            # Crear token de recuperación
+            try:
+                token_obj = TokenRecuperacion.crear_token(user)
+                print(f"🔑 DEBUG WEB: Token creado: {token_obj.token}")
+            except Exception as token_error:
+                print(f"❌ DEBUG WEB: Error creando token: {token_error}")
+                messages.error(request, 'Error interno. Contacta al administrador.')
+                return render(request, 'auth/solicitar_recuperacion.html')
+
+            # Enviar email
+            subject = 'Recuperación de contraseña - GAMERLY'
+
+            # Crear contexto para el template del email
+            current_site = get_current_site(request)
+            context = {
+                'user': user,
+                'domain': current_site.domain,
+                'site_name': 'GAMERLY',
+                'token': token_obj.token,
+                'protocol': 'https' if request.is_secure() else 'http',
+            }
+
+            print(f"🌐 DEBUG WEB: Contexto: {context}")
+
+            # Renderizar el email desde template
+            try:
+                email_body = render_to_string('auth/email_recuperacion.html', context)
+                print(f"✅ DEBUG WEB: Template renderizado OK")
+                print(f"📄 DEBUG WEB: Primeros 100 caracteres: {email_body[:100]}...")
+            except Exception as template_error:
+                print(f"❌ DEBUG WEB: Error en template: {template_error}")
+                messages.error(request, 'Error interno del sistema.')
+                return render(request, 'auth/solicitar_recuperacion.html')
+
+            print(f"📤 DEBUG WEB: Enviando email...")
+            print(f"  - From: {settings.EMAIL_HOST_USER}")
+            print(f"  - To: {user.email}")
+            print(f"  - Subject: {subject}")
+
+            try:
+                result = send_mail(
+                    subject=subject,
+                    message='Versión en texto plano: Para recuperar tu contraseña, usa el enlace en la versión HTML de este email.',
+                    from_email=settings.EMAIL_HOST_USER,  # Usar explícitamente
+                    recipient_list=[user.email],
+                    html_message=email_body,
+                    fail_silently=False,
+                )
+
+                print(f"✅ DEBUG WEB: Email enviado! Resultado: {result}")
+
+                if result == 1:
+                    print("🎉 DEBUG WEB: Email enviado exitosamente")
+                    messages.success(request, 'Se ha enviado un email con instrucciones para recuperar tu contraseña.')
+                    return redirect('login')
+                else:
+                    print(f"⚠️ DEBUG WEB: Send_mail retornó: {result} (esperado: 1)")
+                    messages.error(request, 'Error al enviar email. Intenta nuevamente.')
+
+            except Exception as email_error:
+                print(f"❌ DEBUG WEB: Error enviando email: {type(email_error).__name__}: {email_error}")
+                print(f"🔧 DEBUG WEB: Configuración EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
+                print(f"🔧 DEBUG WEB: Configuración EMAIL_HOST: {settings.EMAIL_HOST}")
+                print(f"🔧 DEBUG WEB: Configuración EMAIL_PORT: {settings.EMAIL_PORT}")
+                messages.error(request, 'Error al enviar el email. Por favor intenta más tarde.')
+                return render(request, 'auth/solicitar_recuperacion.html')
+
+        except Exception as e:
+            print(f"❌ DEBUG WEB: Error general: {type(e).__name__}: {e}")
+            messages.error(request, 'Error interno. Por favor intenta más tarde.')
+
+    return render(request, 'auth/solicitar_recuperacion.html')
+
+
+def confirmar_recuperacion_password(request, token):
+    """Vista para confirmar y cambiar contraseña con token"""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    try:
+        token_obj = TokenRecuperacion.objects.get(token=token)
+
+        if not token_obj.es_valido():
+            messages.error(request, 'El enlace ha expirado o ya fue usado. Solicita uno nuevo.')
+            return redirect('solicitar_recuperacion_password')
+
+        if request.method == 'POST':
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+
+            # Validaciones
+            if not new_password1 or not new_password2:
+                messages.error(request, 'Ambos campos son obligatorios')
+                return render(request, 'auth/confirmar_recuperacion.html', {'token': token})
+
+            if new_password1 != new_password2:
+                messages.error(request, 'Las contraseñas no coinciden')
+                return render(request, 'auth/confirmar_recuperacion.html', {'token': token})
+
+            if len(new_password1) < 8:
+                messages.error(request, 'La contraseña debe tener al menos 8 caracteres')
+                return render(request, 'auth/confirmar_recuperacion.html', {'token': token})
+
+            # Cambiar contraseña
+            user = token_obj.usuario
+            user.set_password(new_password1)
+            user.save()
+
+            # Marcar token como usado
+            token_obj.usado = True
+            token_obj.save()
+
+            messages.success(request, '¡Contraseña cambiada exitosamente! Ya puedes iniciar sesión.')
+            return redirect('login')
+
+        return render(request, 'auth/confirmar_recuperacion.html', {
+            'token': token,
+            'usuario': token_obj.usuario
+        })
+
+    except TokenRecuperacion.DoesNotExist:
+        messages.error(request, 'Enlace inválido o expirado.')
+        return redirect('solicitar_recuperacion_password')
+
+
+def recuperar_password_view(request):
+    """Vista para recuperar contraseña (método anterior)"""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        current_password = request.POST.get('current_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+
+        # Validaciones
+        if not all([username, current_password, new_password1, new_password2]):
+            messages.error(request, 'Todos los campos son obligatorios')
+            return render(request, 'recuperar_password.html')
+
+        if new_password1 != new_password2:
+            messages.error(request, 'Las nuevas contraseñas no coinciden')
+            return render(request, 'recuperar_password.html')
+
+        if len(new_password1) < 8:
+            messages.error(request, 'La nueva contraseña debe tener al menos 8 caracteres')
+            return render(request, 'recuperar_password.html')
+
+        try:
+            # Verificar que el usuario existe
+            user = User.objects.get(username=username)
+
+            # Verificar contraseña actual
+            if not user.check_password(current_password):
+                messages.error(request, 'La contraseña actual es incorrecta')
+                return render(request, 'recuperar_password.html')
+
+            # Cambiar contraseña
+            user.set_password(new_password1)
+            user.save()
+
+            messages.success(request,
+                             'Contraseña cambiada exitosamente. Puedes iniciar sesión con tu nueva contraseña.')
+            return redirect('login')
+
+        except User.DoesNotExist:
+            messages.error(request, 'El usuario no existe')
+            return render(request, 'recuperar_password.html')
+        except Exception as e:
+            messages.error(request, f'Error al cambiar contraseña: {str(e)}')
+            return render(request, 'recuperar_password.html')
+
+    return render(request, 'recuperar_password.html')
+
+
 # ====================== API REST ======================
 
 class ProductoViewSet(viewsets.ModelViewSet):
@@ -749,55 +969,3 @@ def detalle_producto(request, producto_id):
         'carrito': carrito,
     }
     return render(request, 'detalle_producto.html', context)
-
-def recuperar_password_view(request):
-    """Vista para recuperar contraseña"""
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        current_password = request.POST.get('current_password')
-        new_password1 = request.POST.get('new_password1')
-        new_password2 = request.POST.get('new_password2')
-
-        # Validaciones
-        if not all([username, current_password, new_password1, new_password2]):
-            messages.error(request, 'Todos los campos son obligatorios')
-            return render(request, 'recuperar_password.html')
-
-        if new_password1 != new_password2:
-            messages.error(request, 'Las nuevas contraseñas no coinciden')
-            return render(request, 'recuperar_password.html')
-
-        if len(new_password1) < 8:
-            messages.error(request, 'La nueva contraseña debe tener al menos 8 caracteres')
-            return render(request, 'recuperar_password.html')
-
-        try:
-            # Verificar que el usuario existe
-            user = User.objects.get(username=username)
-
-            # Verificar contraseña actual
-            if not user.check_password(current_password):
-                messages.error(request, 'La contraseña actual es incorrecta')
-                return render(request, 'recuperar_password.html')
-
-            # Cambiar contraseña
-            user.set_password(new_password1)
-            user.save()
-
-            messages.success(request,
-                             'Contraseña cambiada exitosamente. Puedes iniciar sesión con tu nueva contraseña.')
-            return redirect('login')
-
-        except User.DoesNotExist:
-            messages.error(request, 'El usuario no existe')
-            return render(request, 'recuperar_password.html')
-        except Exception as e:
-            messages.error(request, f'Error al cambiar contraseña: {str(e)}')
-            return render(request, 'recuperar_password.html')
-
-    return render(request, 'recuperar_password.html')
-
-
