@@ -502,47 +502,89 @@ def perfil_view(request):
 @login_required
 @csrf_exempt
 def actualizar_perfil(request):
-    """Actualizar perfil de usuario vía AJAX"""
+    """Actualizar perfil de usuario vía AJAX - CORREGIDO"""
     if request.method == 'POST':
         try:
+            print("🔍 DEBUG: Iniciando actualización de perfil")
+            print(f"📋 POST data recibida: {dict(request.POST)}")
+
             # Obtener o crear perfil
             perfil, created = PerfilUsuario.objects.get_or_create(usuario=request.user)
+            print(f"✅ Perfil obtenido: {perfil}")
 
             # Actualizar datos del usuario
             user = request.user
-            user.first_name = request.POST.get('first_name', user.first_name)
-            user.last_name = request.POST.get('last_name', user.last_name)
-            user.email = request.POST.get('email', user.email)
 
-            # Validar email único
-            if User.objects.filter(email=user.email).exclude(id=user.id).exists():
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Este email ya está en uso por otra cuenta'
-                })
+            # ✅ CAMBIOS PRINCIPALES: Obtener datos correctamente del POST
+            first_name = request.POST.get('first_name', '').strip()
+            last_name = request.POST.get('last_name', '').strip()
+            email = request.POST.get('email', '').strip()
 
+            print(f"📝 Datos a actualizar: first_name='{first_name}', last_name='{last_name}', email='{email}'")
+
+            # Solo actualizar si hay valores
+            if first_name:
+                user.first_name = first_name
+            if last_name:
+                user.last_name = last_name
+            if email:
+                # Validar email único
+                if User.objects.filter(email=email).exclude(id=user.id).exists():
+                    print(f"❌ Email duplicado: {email}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Este email ya está en uso por otra cuenta'
+                    })
+                user.email = email
+
+            # ✅ IMPORTANTE: Guardar el usuario primero
             user.save()
+            print(f"✅ Usuario actualizado: {user.first_name} {user.last_name} - {user.email}")
 
             # Actualizar datos del perfil
-            perfil.telefono = request.POST.get('telefono', perfil.telefono)
-            perfil.direccion = request.POST.get('direccion', perfil.direccion)
+            telefono = request.POST.get('telefono', '').strip()
+            direccion = request.POST.get('direccion', '').strip()
+            fecha_nacimiento = request.POST.get('fecha_nacimiento', '').strip()
 
-            fecha_nacimiento = request.POST.get('fecha_nacimiento')
+            print(f"📱 Perfil a actualizar: telefono='{telefono}', direccion='{direccion}', fecha='{fecha_nacimiento}'")
+
+            # Actualizar campos del perfil solo si hay valores
+            if telefono:
+                perfil.telefono = telefono
+            if direccion:
+                perfil.direccion = direccion
+
+            # Manejar fecha de nacimiento
             if fecha_nacimiento:
                 from datetime import datetime
                 try:
                     perfil.fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d').date()
-                except ValueError:
-                    pass  # Ignorar fecha inválida
+                    print(f"✅ Fecha actualizada: {perfil.fecha_nacimiento}")
+                except ValueError as e:
+                    print(f"❌ Error en fecha: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Formato de fecha inválido'
+                    })
 
+            # ✅ IMPORTANTE: Guardar el perfil
             perfil.save()
+            print(f"✅ Perfil actualizado: telefono={perfil.telefono}, direccion={perfil.direccion}")
 
             return JsonResponse({
                 'success': True,
-                'message': 'Perfil actualizado correctamente'
+                'message': 'Perfil actualizado correctamente',
+                'data': {
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'email': user.email,
+                    'telefono': perfil.telefono,
+                    'direccion': perfil.direccion,
+                }
             })
 
         except Exception as e:
+            print(f"❌ Error actualizando perfil: {e}")
             return JsonResponse({
                 'success': False,
                 'message': f'Error al actualizar perfil: {str(e)}'

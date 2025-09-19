@@ -43,39 +43,39 @@
                         <div class="col-md-6 mb-3">
                             <label for="first_name" class="form-label">Nombre</label>
                             <input type="text" class="form-control" id="first_name" name="first_name" 
-                                   value="{{ user.first_name }}" readonly>
+                                   value="{{ user.first_name|default:'' }}" readonly>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="last_name" class="form-label">Apellido</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" 
-                                   value="{{ user.last_name }}" readonly>
+                            <input type="text" class="form-control" id="last_name" name="last_name"
+                                   value="{{ user.last_name|default:'' }}" readonly>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="username" class="form-label">Usuario</label>
-                            <input type="text" class="form-control" id="username" name="username" 
+                            <input type="text" class="form-control" id="username" name="username"
                                    value="{{ user.username }}" readonly>
                             <small class="text-muted">El nombre de usuario no se puede cambiar</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   value="{{ user.email }}" readonly>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   value="{{ user.email|default:'' }}" readonly>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="telefono" class="form-label">Teléfono</label>
-                            <input type="tel" class="form-control" id="telefono" name="telefono" 
+                            <input type="tel" class="form-control" id="telefono" name="telefono"
                                    value="{{ perfil.telefono|default:'' }}" readonly>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" 
-                                   value="{{ perfil.fecha_nacimiento|date:'Y-m-d'|default:'' }}" readonly>
+                            <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento"
+                                   value="{% if perfil.fecha_nacimiento %}{{ perfil.fecha_nacimiento|date:'Y-m-d' }}{% endif %}" readonly>
                         </div>
                     </div>
 
@@ -116,7 +116,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="new_password1" class="form-label">Nueva Contraseña</label>
                         <div class="input-group">
@@ -127,7 +127,7 @@
                         </div>
                         <small class="text-muted">Mínimo 8 caracteres con letras y números</small>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="new_password2" class="form-label">Confirmar Nueva Contraseña</label>
                         <div class="input-group">
@@ -137,7 +137,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <button type="button" class="btn btn-warning" onclick="cambiarPassword()">
                         <i class="fas fa-key me-1"></i>Cambiar Contraseña
                     </button>
@@ -212,7 +212,7 @@
             <div class="card-body">
                 <ul class="list-unstyled mb-0">
                     <li class="mb-2">
-                        <strong>Estado:</strong> 
+                        <strong>Estado:</strong>
                         <span class="badge bg-success">Activa</span>
                     </li>
                     <li class="mb-2">
@@ -239,7 +239,7 @@ function toggleEditMode() {
     const inputs = document.querySelectorAll('#perfilForm input[readonly], #perfilForm textarea[readonly]');
     const editButton = document.getElementById('editButtonText');
     const saveButtons = document.getElementById('saveButtons');
-    
+
     if (editMode) {
         // Guardar valores originales
         inputs.forEach(input => {
@@ -261,7 +261,7 @@ function cancelarEdicion() {
     const inputs = document.querySelectorAll('#perfilForm input, #perfilForm textarea');
     const editButton = document.getElementById('editButtonText');
     const saveButtons = document.getElementById('saveButtons');
-    
+
     // Restaurar valores originales
     inputs.forEach(input => {
         if (input.id !== 'username') {
@@ -271,51 +271,138 @@ function cancelarEdicion() {
             }
         }
     });
-    
+
     editButton.textContent = 'Editar';
     saveButtons.classList.add('d-none');
     originalValues = {};
 }
 
+// ✅ FUNCIÓN CORREGIDA PRINCIPAL - CON ACTUALIZACIÓN EN TIEMPO REAL
 function guardarPerfil() {
-    const formData = new FormData(document.getElementById('perfilForm'));
+    // ✅ CORRECCIÓN: Usar FormData correctamente
+    const form = document.getElementById('perfilForm');
+    const formData = new FormData(form);
+
+    // ✅ DEBUG: Mostrar qué se está enviando
+    console.log('📤 Enviando datos del perfil:');
+    for (let pair of formData.entries()) {
+        console.log(`  ${pair[0]}: "${pair[1]}"`);
+    }
+
+    // ✅ OBTENER CSRF TOKEN CORRECTAMENTE
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
+    console.log('🔐 CSRF Token:', csrfToken ? 'Encontrado' : 'NO ENCONTRADO');
+
+    if (!csrfToken) {
+        mostrarMensaje('Error de seguridad: Token CSRF no encontrado', 'error');
+        return;
+    }
+
     fetch('/ajax/actualizar-perfil/', {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrfToken
+            // ✅ NO agregar Content-Type cuando usamos FormData
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📥 Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('📋 Response data:', data);
+
         if (data.success) {
             mostrarMensaje(data.message, 'success');
-            toggleEditMode(); // Salir del modo edición
+
+            // ✅ SOLUCIÓN PRINCIPAL: ACTUALIZAR CAMPOS INMEDIATAMENTE CON LOS VALORES ACTUALES DEL FORMULARIO
+            // En lugar de esperar data.data del servidor, usar los valores que el usuario acaba de editar
+
+            // Actualizar los valores de los campos readonly con lo que el usuario escribió
+            const firstNameInput = document.getElementById('first_name');
+            const lastNameInput = document.getElementById('last_name');
+            const emailInput = document.getElementById('email');
+            const telefonoInput = document.getElementById('telefono');
+            const direccionInput = document.getElementById('direccion');
+            const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+
+            // Guardar los valores actuales ANTES de cambiar a readonly
+            const nuevosValores = {
+                first_name: firstNameInput.value,
+                last_name: lastNameInput.value,
+                email: emailInput.value,
+                telefono: telefonoInput.value,
+                direccion: direccionInput.value,
+                fecha_nacimiento: fechaNacimientoInput.value
+            };
+
+            console.log('💾 Guardando valores actualizados:', nuevosValores);
+
+            // ✅ PRIMERO: Salir del modo edición (esto pone los campos en readonly)
+            cancelarEdicion();
+
+            // ✅ SEGUNDO: INMEDIATAMENTE actualizar los valores visibles
+            // Esto asegura que los campos readonly muestren los nuevos valores
+            firstNameInput.value = nuevosValores.first_name;
+            lastNameInput.value = nuevosValores.last_name;
+            emailInput.value = nuevosValores.email;
+            telefonoInput.value = nuevosValores.telefono;
+            direccionInput.value = nuevosValores.direccion;
+            fechaNacimientoInput.value = nuevosValores.fecha_nacimiento;
+
+            console.log('✅ Campos actualizados visualmente en tiempo real');
+
+            // ✅ BONUS: También actualizar los valores originales para futuras ediciones
+            originalValues = {
+                first_name: nuevosValores.first_name,
+                last_name: nuevosValores.last_name,
+                email: nuevosValores.email,
+                telefono: nuevosValores.telefono,
+                direccion: nuevosValores.direccion,
+                fecha_nacimiento: nuevosValores.fecha_nacimiento
+            };
+
         } else {
-            mostrarMensaje(data.message, 'error');
+            mostrarMensaje(data.message || 'Error desconocido', 'error');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        mostrarMensaje('Error al actualizar perfil', 'error');
+        console.error('❌ Error completo:', error);
+        mostrarMensaje('Error al actualizar perfil. Revisa la consola para más detalles.', 'error');
     });
 }
 
+// ✅ FUNCIÓN DE CAMBIAR PASSWORD TAMBIÉN CORREGIDA
 function cambiarPassword() {
-    const formData = new FormData(document.getElementById('passwordForm'));
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
+    // ✅ USAR FormData EN LUGAR DE JSON
+    const form = document.getElementById('passwordForm');
+    const formData = new FormData(form);
+
     // Validar que las contraseñas coincidan
     const newPassword1 = formData.get('new_password1');
     const newPassword2 = formData.get('new_password2');
-    
+
     if (newPassword1 !== newPassword2) {
         mostrarMensaje('Las nuevas contraseñas no coinciden', 'error');
         return;
     }
-    
+
+    if (newPassword1.length < 8) {
+        mostrarMensaje('La nueva contraseña debe tener al menos 8 caracteres', 'error');
+        return;
+    }
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    if (!csrfToken) {
+        mostrarMensaje('Error de seguridad: Token CSRF no encontrado', 'error');
+        return;
+    }
+
     fetch('/ajax/cambiar-password/', {
         method: 'POST',
         headers: {
@@ -377,5 +464,31 @@ function mostrarMensaje(mensaje, tipo) {
         }
     }, 5000);
 }
+
+// ✅ DEBUG AL CARGAR LA PÁGINA
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎮 Perfil de GAMERLY cargado');
+
+    // Verificar que el CSRF token esté presente
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfToken) {
+        console.log('✅ CSRF token encontrado correctamente');
+    } else {
+        console.error('❌ CSRF token NO encontrado - esto causará errores');
+    }
+
+    // Verificar formulario
+    const form = document.getElementById('perfilForm');
+    if (form) {
+        console.log('✅ Formulario de perfil encontrado');
+        console.log('📋 Valores actuales en el formulario:');
+        const formData = new FormData(form);
+        for (let pair of formData.entries()) {
+            console.log(`  ${pair[0]}: "${pair[1]}"`);
+        }
+    } else {
+        console.error('❌ Formulario de perfil NO encontrado');
+    }
+});
 </script>
 {% endblock %}
