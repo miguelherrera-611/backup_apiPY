@@ -28,8 +28,9 @@ class Producto(models.Model):
 
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
-    precio = models.CharField(max_length=20, help_text="Precio como texto")
-    precio_oferta = models.CharField(max_length=20, null=True, blank=True, help_text="Precio de oferta como texto")
+    precio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio")
+    precio_oferta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                        verbose_name="Precio Oferta")
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     stock = models.PositiveIntegerField(default=0)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
@@ -48,29 +49,29 @@ class Producto(models.Model):
     def precio_actual(self):
         """Retorna el precio con oferta si existe, sino el precio normal"""
         if self.precio_oferta:
-            try:
-                return Decimal(self.precio_oferta)
-            except:
-                pass
-        try:
-            return Decimal(self.precio)
-        except:
-            return Decimal('0.00')
+            return self.precio_oferta
+        return self.precio
+
+    @property
+    def precio_formateado(self):
+        """Retorna el precio en formato colombiano: $129.000 COL"""
+        precio = self.precio_actual()
+        return f"${int(precio):,} COL".replace(',', '.')
+
+    @property
+    def precio_formateado_sin_col(self):
+        """Retorna solo el número formateado: $129.000"""
+        precio = self.precio_actual()
+        return f"${int(precio):,}".replace(',', '.')
 
     def precio_actual_str(self):
-        """Retorna el precio actual como string para mostrar"""
+        """Retorna el precio actual como string para mostrar - COMPATIBILIDAD"""
         return str(self.precio_actual())
 
     def descuento_porcentaje(self):
         """Calcula el porcentaje de descuento si hay precio de oferta"""
-        if self.precio_oferta:
-            try:
-                precio_normal = Decimal(self.precio)
-                precio_oferta = Decimal(self.precio_oferta)
-                if precio_oferta < precio_normal:
-                    return int(((precio_normal - precio_oferta) / precio_normal) * 100)
-            except:
-                pass
+        if self.precio_oferta and self.precio_oferta < self.precio:
+            return int(((self.precio - self.precio_oferta) / self.precio) * 100)
         return 0
 
     def en_stock(self):

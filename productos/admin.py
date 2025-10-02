@@ -74,7 +74,7 @@ class ProductoAdmin(BaseGamingAdmin, admin.ModelAdmin):
                     'stock_visual', 'estado_badge', 'destacado', 'destacado_star']
     list_filter = ['categoria', 'estado', 'destacado', 'fecha_creacion']
     search_fields = ['nombre', 'descripcion']
-    list_editable = ['precio', 'stock', 'destacado']
+    list_editable = ['stock', 'destacado']
     readonly_fields = ['imagen_preview', 'fecha_creacion', 'fecha_actualizacion']
 
     fieldsets = (
@@ -84,7 +84,8 @@ class ProductoAdmin(BaseGamingAdmin, admin.ModelAdmin):
         }),
         ('💰 Precios y Stock', {
             'fields': ('precio', 'precio_oferta', 'stock'),
-            'classes': ('gaming-fieldset',)
+            'classes': ('gaming-fieldset',),
+            'description': 'Ingresa los precios como números sin puntos ni comas. Ej: 115000'
         }),
         ('🖼️ Imagen', {
             'fields': ('imagen', 'imagen_preview'),
@@ -140,19 +141,23 @@ class ProductoAdmin(BaseGamingAdmin, admin.ModelAdmin):
     categoria_visual.short_description = 'Categoría'
 
     def precio_visual(self, obj):
+        # Formatear precio en formato colombiano
+        precio_formateado = f"{int(obj.precio):,}".replace(',', '.')
+
         if obj.precio_oferta:
+            precio_oferta_formateado = f"{int(obj.precio_oferta):,}".replace(',', '.')
             return format_html(
                 '<div>'
-                '<span style="text-decoration: line-through; color: #6b7280;">${}</span><br>'
-                '<span style="font-weight: bold; color: #10b981; font-size: 1.1em;">${}</span>'
+                '<span style="text-decoration: line-through; color: #6b7280;">${} COL</span><br>'
+                '<span style="font-weight: bold; color: #10b981; font-size: 1.1em;">${} COL</span>'
                 '<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.8em; margin-left: 5px;">OFERTA</span>'
                 '</div>',
-                obj.precio, obj.precio_oferta
+                precio_formateado, precio_oferta_formateado
             )
         else:
             return format_html(
-                '<span style="font-weight: bold; color: #8b5cf6; font-size: 1.1em;">${}</span>',
-                obj.precio
+                '<span style="font-weight: bold; color: #8b5cf6; font-size: 1.1em;">${} COL</span>',
+                precio_formateado
             )
 
     precio_visual.short_description = 'Precio Visual'
@@ -261,9 +266,10 @@ class ItemCarritoInline(admin.TabularInline):
     fields = ['producto', 'cantidad', 'subtotal_visual', 'fecha_agregado']
 
     def subtotal_visual(self, obj):
+        subtotal_formateado = f"{int(obj.subtotal()):,}".replace(',', '.')
         return format_html(
-            '<span style="font-weight: bold; color: #10b981; font-size: 1.1em;">${}</span>',
-            obj.subtotal()
+            '<span style="font-weight: bold; color: #10b981; font-size: 1.1em;">${} COL</span>',
+            subtotal_formateado
         )
 
     subtotal_visual.short_description = 'Subtotal'
@@ -298,9 +304,10 @@ class CarritoAdmin(BaseGamingAdmin, admin.ModelAdmin):
     items_count.short_description = 'Items'
 
     def total_visual(self, obj):
+        total_formateado = f"{int(obj.total_precio()):,}".replace(',', '.')
         return format_html(
-            '<span style="font-weight: bold; color: #10b981; font-size: 1.2em;">${}</span>',
-            obj.total_precio()
+            '<span style="font-weight: bold; color: #10b981; font-size: 1.2em;">${} COL</span>',
+            total_formateado
         )
 
     total_visual.short_description = 'Total'
@@ -330,9 +337,10 @@ class ItemCarritoAdmin(BaseGamingAdmin, admin.ModelAdmin):
     producto_info.short_description = 'Producto'
 
     def subtotal_visual(self, obj):
+        subtotal_formateado = f"{int(obj.subtotal()):,}".replace(',', '.')
         return format_html(
-            '<span style="font-weight: bold; color: #10b981; font-size: 1.1em;">${}</span>',
-            obj.subtotal()
+            '<span style="font-weight: bold; color: #10b981; font-size: 1.1em;">${} COL</span>',
+            subtotal_formateado
         )
 
     subtotal_visual.short_description = 'Subtotal'
@@ -364,24 +372,3 @@ add_gaming_css_to_all_admin_classes()
 # Personalización adicional del sitio admin
 admin.site.empty_value_display = '(Sin valor)'
 admin.site.enable_nav_sidebar = True
-
-
-# Configuración de interfaz mejorada
-class GamingAdminSite(admin.AdminSite):
-    """Personalización completa del sitio admin con tema gaming"""
-    site_header = "🎮 GAMERLY Administration"
-    site_title = "GAMERLY Admin"
-    index_title = "Panel de Control Gaming"
-
-    def each_context(self, request):
-        """Agregar contexto personalizado a todas las páginas del admin"""
-        context = super().each_context(request)
-        context.update({
-            'gaming_mode': True,
-            'site_brand': 'GAMERLY',
-            'show_sidebar': True,
-        })
-        return context
-
-# Reemplazar el sitio admin por defecto (opcional)
-# admin_site = GamingAdminSite(name='gaming_admin')
