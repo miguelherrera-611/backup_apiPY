@@ -52,26 +52,56 @@ class Producto(models.Model):
             return self.precio_oferta
         return self.precio
 
+    # ===== MÉTODOS MEJORADOS DE FORMATO DE PRECIO =====
+
     @property
     def precio_formateado(self):
-        """Retorna el precio en formato colombiano: $129.000 COL"""
+        """Retorna el precio ACTUAL en formato colombiano completo: $129.000 COL"""
         precio = self.precio_actual()
-        return f"${int(precio):,} COL".replace(',', '.')
+        precio_int = int(precio)
+        precio_str = f"{precio_int:,}".replace(',', '.')
+        return f"${precio_str} COL"
+
+    @property
+    def precio_normal_formateado(self):
+        """Retorna el precio NORMAL en formato colombiano: $129.000"""
+        precio_int = int(self.precio)
+        precio_str = f"{precio_int:,}".replace(',', '.')
+        return f"${precio_str}"
+
+    @property
+    def precio_oferta_formateado(self):
+        """Retorna el precio de OFERTA en formato colombiano: $99.000"""
+        if self.precio_oferta:
+            precio_int = int(self.precio_oferta)
+            precio_str = f"{precio_int:,}".replace(',', '.')
+            return f"${precio_str}"
+        return None
 
     @property
     def precio_formateado_sin_col(self):
-        """Retorna solo el número formateado: $129.000"""
+        """Retorna solo el número formateado del precio actual: $129.000"""
         precio = self.precio_actual()
-        return f"${int(precio):,}".replace(',', '.')
+        precio_int = int(precio)
+        precio_str = f"{precio_int:,}".replace(',', '.')
+        return f"${precio_str}"
+
+    @property
+    def precio_solo_numero(self):
+        """Retorna solo el número con puntos sin símbolo: 129.000"""
+        precio = self.precio_actual()
+        precio_int = int(precio)
+        return f"{precio_int:,}".replace(',', '.')
 
     def precio_actual_str(self):
-        """Retorna el precio actual como string para mostrar - COMPATIBILIDAD"""
-        return str(self.precio_actual())
+        """Retorna el precio actual como string - COMPATIBILIDAD"""
+        return str(int(self.precio_actual()))
 
     def descuento_porcentaje(self):
         """Calcula el porcentaje de descuento si hay precio de oferta"""
         if self.precio_oferta and self.precio_oferta < self.precio:
-            return int(((self.precio - self.precio_oferta) / self.precio) * 100)
+            descuento = ((self.precio - self.precio_oferta) / self.precio) * 100
+            return int(descuento)
         return 0
 
     def en_stock(self):
@@ -123,6 +153,13 @@ class Carrito(models.Model):
             total += item.subtotal()
         return total
 
+    def total_precio_formateado(self):
+        """Retorna el total formateado en pesos colombianos: $XXX.XXX COL"""
+        total = self.total_precio()
+        total_int = int(total)
+        total_str = f"{total_int:,}".replace(',', '.')
+        return f"${total_str} COL"
+
     def limpiar_carrito(self):
         """Elimina todos los items del carrito"""
         self.items.all().delete()
@@ -146,6 +183,13 @@ class ItemCarrito(models.Model):
         """Calcula el subtotal del item (precio x cantidad)"""
         precio_actual = self.producto.precio_actual()
         return precio_actual * self.cantidad
+
+    def subtotal_formateado(self):
+        """Retorna el subtotal formateado en pesos colombianos: $XXX.XXX COL"""
+        subtotal = self.subtotal()
+        subtotal_int = int(subtotal)
+        subtotal_str = f"{subtotal_int:,}".replace(',', '.')
+        return f"${subtotal_str} COL"
 
     def puede_aumentar_cantidad(self):
         """Verifica si se puede aumentar la cantidad basado en el stock"""

@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Inicio - GAMERLY{% endblock %}
@@ -555,10 +556,10 @@
                             <div class="producto-precios">
                                 {% if producto.precio_oferta %}
                                     <span class="precio-normal">${{ producto.precio }}</span>
-                                    <span class="precio-actual">${{ producto.precio_formateado }}</span>
+                                    <span class="precio-actual">${{ producto.precio_oferta }}</span>
                                     <span class="precio-oferta-badge">OFERTA</span>
                                 {% else %}
-                                    <span class="precio-actual">${{ producto.precio_formateado }}</span>
+                                    <span class="precio-actual">${{ producto.precio }}</span>
                                 {% endif %}
                             </div>
 

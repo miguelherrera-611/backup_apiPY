@@ -51,10 +51,10 @@
                     {% if producto.precio_oferta %}
                         <div class="d-flex align-items-center mb-2">
                             <span class="text-muted text-decoration-line-through h5 me-3">
-                                ${{ producto.precio_formateado_sin_col }}
+                                ${{ producto.precio }}
                             </span>
                             <span class="h2 text-success mb-0 me-3">
-                                ${{ producto.precio_formateado }}
+                                ${{ producto.precio_oferta }}
                             </span>
                             <span class="badge bg-success">
                                 ¡OFERTA!
@@ -62,7 +62,7 @@
                         </div>
                     {% else %}
                         <h2 class="text-primary mb-3">
-                            ${{ producto.precio_formateado }}
+                            ${{ producto.precio }}
                         </h2>
                     {% endif %}
                 </div>
@@ -72,7 +72,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <p class="mb-2">
-                                <strong>Stock disponible:</strong> 
+                                <strong>Stock disponible:</strong>
                                 <span class="badge bg-{% if producto.stock > 5 %}success{% elif producto.stock > 0 %}warning{% else %}danger{% endif %}">
                                     {{ producto.stock }} unidades
                                 </span>
@@ -80,7 +80,7 @@
                         </div>
                         <div class="col-md-6">
                             <p class="mb-2">
-                                <strong>Estado:</strong> 
+                                <strong>Estado:</strong>
                                 {% if producto.en_stock %}
                                     <span class="badge bg-success">
                                         <i class="fas fa-check me-1"></i>Disponible
@@ -121,7 +121,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-8">
-                                    <button class="btn btn-success btn-lg w-100" 
+                                    <button class="btn btn-success btn-lg w-100"
                                             onclick="agregarAlCarrito({{ producto.id }})">
                                         <i class="fas fa-cart-plus me-2"></i>
                                         Agregar al Carrito
@@ -196,8 +196,8 @@
                     <div class="card product-card h-100">
                         <div class="position-relative">
                             {% if producto_rel.imagen %}
-                                <img src="{{ producto_rel.imagen.url }}" 
-                                     class="card-img-top product-image" 
+                                <img src="{{ producto_rel.imagen.url }}"
+                                     class="card-img-top product-image"
                                      alt="{{ producto_rel.nombre }}"
                                      style="height: 200px; object-fit: cover;">
                             {% else %}
@@ -213,14 +213,14 @@
                                 <div class="mb-2">
                                     {% if producto_rel.precio_oferta %}
                                         <span class="text-muted text-decoration-line-through small">
-                                            ${{ producto_rel.precio_formateado_sin_col }}
+                                            ${{ producto_rel.precio }}
                                         </span>
                                         <span class="h6 text-success">
-                                            ${{ producto_rel.precio_formateado }}
+                                            ${{ producto_rel.precio_oferta }}
                                         </span>
                                     {% else %}
                                         <span class="h6 text-primary">
-                                            ${{ producto_rel.precio_formateado }}
+                                            ${{ producto_rel.precio }}
                                         </span>
                                     {% endif %}
                                 </div>

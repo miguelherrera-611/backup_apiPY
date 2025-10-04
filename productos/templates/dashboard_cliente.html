@@ -130,10 +130,10 @@
                             {% if producto.precio_oferta %}
                                 <div class="d-flex align-items-center">
                                     <span class="text-muted text-decoration-line-through me-2">
-                                        {{ producto.precio }}
+                                        ${{ producto.precio }}
                                     </span>
                                     <span class="h4 text-success mb-0 me-2">
-                                        {{ producto.precio_formateado }}
+                                        ${{ producto.precio_oferta }}
                                     </span>
                                     <span class="badge bg-success">
                                         Oferta
@@ -141,7 +141,7 @@
                                 </div>
                             {% else %}
                                 <span class="h4 text-primary mb-0">
-                                    {{ producto.precio_formateado }}
+                                    ${{ producto.precio }}
                                 </span>
                             {% endif %}
                         </div>
