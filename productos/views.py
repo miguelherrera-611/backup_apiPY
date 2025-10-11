@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 import json
 
+from .models import TokenLogin
 from .models import Producto, Categoria, PerfilUsuario, Carrito, ItemCarrito, TokenRecuperacion
 from .serializers import (
     ProductoSerializer, ProductoListSerializer,
@@ -41,8 +42,15 @@ def home(request):
     return render(request, 'home.html', context)
 
 
+
+
+
+
+"""login por token"""
+
+
 def login_view(request):
-    """Vista de login"""
+    """Vista de login con 2FA por email"""
     if request.user.is_authenticated:
         return redirect('dashboard')
 
@@ -52,13 +60,150 @@ def login_view(request):
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user)
-            messages.success(request, f'¡Bienvenido, {user.first_name or user.username}!')
-            return redirect('dashboard')
+            # ✅ Usuario y contraseña correctos - Enviar token por email
+
+            if not user.email:
+                messages.error(request, 'Tu cuenta no tiene email configurado. Contacta al administrador.')
+                return render(request, 'login.html')
+
+            try:
+                # Crear token
+                from .models import TokenLogin
+                ip_address = request.META.get('REMOTE_ADDR')
+                token_obj = TokenLogin.crear_token(user, ip_address)
+
+                # Enviar email con token
+                subject = 'Código de verificación - GAMERLY'
+                context = {
+                    'user': user,
+                    'token': token_obj.token,
+                    'ip_address': ip_address,
+                }
+                email_body = render_to_string('auth/email_token_login.html', context)
+
+                send_mail(
+                    subject=subject,
+                    message=f'Tu código de verificación es: {token_obj.token}',
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[user.email],
+                    html_message=email_body,
+                    fail_silently=False,
+                )
+
+                # Guardar username en sesión para verificación
+                request.session['pending_username'] = username
+                request.session['pending_user_id'] = user.id
+
+                messages.success(request, f'✅ Se ha enviado un código de verificación a {user.email}')
+                return redirect('verificar_token_login')
+
+            except Exception as e:
+                messages.error(request, 'Error al enviar el código. Intenta nuevamente.')
+                return render(request, 'login.html')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos')
 
     return render(request, 'login.html')
+
+
+def verificar_token_login(request):
+    """Vista para verificar el token de login"""
+    # Verificar que haya un login pendiente
+    if 'pending_user_id' not in request.session:
+        messages.error(request, 'No hay un login pendiente.')
+        return redirect('login')
+
+    user_id = request.session.get('pending_user_id')
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'Usuario no encontrado.')
+        return redirect('login')
+
+    if request.method == 'POST':
+        token_ingresado = request.POST.get('token', '').strip()
+
+        if not token_ingresado:
+            messages.error(request, 'Por favor ingresa el código')
+            return render(request, 'auth/verificar_token_login.html', {'user': user})
+
+        try:
+            from .models import TokenLogin
+            token_obj = TokenLogin.objects.filter(
+                usuario=user,
+                token=token_ingresado,
+                usado=False
+            ).first()
+
+            if token_obj and token_obj.es_valido():
+                # ✅ Token correcto - Iniciar sesión
+                token_obj.usado = True
+                token_obj.save()
+
+                # Limpiar sesión
+                del request.session['pending_username']
+                del request.session['pending_user_id']
+
+                # Login
+                login(request, user)
+                messages.success(request, f'¡Bienvenido, {user.first_name or user.username}!')
+                return redirect('dashboard')
+            else:
+                messages.error(request, '❌ Código inválido o expirado')
+                return render(request, 'auth/verificar_token_login.html', {'user': user})
+
+        except Exception as e:
+            messages.error(request, 'Error al verificar el código')
+            return render(request, 'auth/verificar_token_login.html', {'user': user})
+
+    return render(request, 'auth/verificar_token_login.html', {'user': user})
+
+
+def reenviar_token_login(request):
+    """Reenviar código de verificación"""
+    if 'pending_user_id' not in request.session:
+        return JsonResponse({'success': False, 'message': 'No hay un login pendiente'})
+
+    try:
+        user = User.objects.get(id=request.session['pending_user_id'])
+
+        from .models import TokenLogin
+        ip_address = request.META.get('REMOTE_ADDR')
+        token_obj = TokenLogin.crear_token(user, ip_address)
+
+        # Enviar email
+        subject = 'Nuevo código de verificación - GAMERLY'
+        context = {
+            'user': user,
+            'token': token_obj.token,
+            'ip_address': ip_address,
+        }
+        email_body = render_to_string('auth/email_token_login.html', context)
+
+        send_mail(
+            subject=subject,
+            message=f'Tu nuevo código de verificación es: {token_obj.token}',
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            html_message=email_body,
+            fail_silently=False,
+        )
+
+        return JsonResponse({'success': True, 'message': '✅ Código reenviado'})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': 'Error al reenviar código'})
+
+
+
+
+
+
+
+
+
+"""login for token"""
 
 
 @login_required
@@ -380,7 +525,6 @@ def carrito_items_ajax(request):
     """Obtener items del carrito para mostrar en el dropdown"""
     try:
         carrito = request.user.carrito
-        # MOSTRAR TODOS los items sin limitación
         items = carrito.items.select_related('producto').all()
 
         items_data = []
@@ -402,7 +546,7 @@ def carrito_items_ajax(request):
             'total_items': carrito.total_items(),
             'total_precio': float(carrito.total_precio()),
             'items_count': items.count(),
-            'has_more': False  # Ya no limitamos
+            'has_more': False
         })
     except Carrito.DoesNotExist:
         return JsonResponse({
@@ -423,38 +567,63 @@ def carrito_items_ajax(request):
 # ====================== VISTAS DE USUARIO ======================
 
 def registro_view(request):
-    """Vista de registro de usuarios"""
+    """Vista de registro de usuarios - CON VALIDACIONES ROBUSTAS"""
     if request.user.is_authenticated:
         return redirect('dashboard')
 
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        password1 = request.POST.get('password1', '').strip()
+        password2 = request.POST.get('password2', '').strip()
 
-        # Validaciones
+        # ✅ VALIDACIONES MEJORADAS
+        errores = []
+
+        # Validar campos vacíos
         if not all([username, email, first_name, last_name, password1, password2]):
-            messages.error(request, 'Todos los campos son obligatorios')
-            return render(request, 'registro.html')
+            errores.append('Todos los campos son obligatorios')
 
-        if password1 != password2:
-            messages.error(request, 'Las contraseñas no coinciden')
-            return render(request, 'registro.html')
+        # Validar email
+        if email and '@' not in email:
+            errores.append('El email no es válido')
 
-        if len(password1) < 8:
-            messages.error(request, 'La contraseña debe tener al menos 8 caracteres')
-            return render(request, 'registro.html')
+        # Validar username
+        if username and len(username) < 3:
+            errores.append('El nombre de usuario debe tener al menos 3 caracteres')
+
+        # ✅ VALIDACIONES DE CONTRASEÑA ROBUSTAS
+        if password1:
+            if len(password1) < 8:
+                errores.append('La contraseña debe tener al menos 8 caracteres')
+            elif password1.isdigit():
+                errores.append('La contraseña no puede ser solo números')
+            elif password1.isalpha():
+                errores.append('La contraseña no puede ser solo letras')
+            elif password1.lower() in ['12345678', 'password', 'contraseña', '11111111', 'qwerty123', 'abc12345']:
+                errores.append('La contraseña es demasiado común. Usa una más segura')
+            elif not any(c.isalpha() for c in password1) or not any(c.isdigit() for c in password1):
+                errores.append('La contraseña debe contener letras y números')
+            elif username and username.lower() in password1.lower():
+                errores.append('La contraseña no puede contener tu nombre de usuario')
+
+        # Validar que las contraseñas coincidan
+        if password1 and password2 and password1 != password2:
+            errores.append('Las contraseñas no coinciden')
 
         # Verificar que el usuario no exista
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'El nombre de usuario ya está en uso')
-            return render(request, 'registro.html')
+        if username and User.objects.filter(username=username).exists():
+            errores.append('El nombre de usuario ya está en uso')
 
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'El email ya está registrado')
+        if email and User.objects.filter(email=email).exists():
+            errores.append('El email ya está registrado')
+
+        # Si hay errores, mostrarlos y no crear el usuario
+        if errores:
+            for error in errores:
+                messages.error(request, error)
             return render(request, 'registro.html')
 
         try:
@@ -467,10 +636,7 @@ def registro_view(request):
                 last_name=last_name
             )
 
-            # El perfil y carrito se crean automáticamente por las señales
             messages.success(request, f'¡Bienvenido a GAMERLY, {first_name}! Tu cuenta ha sido creada exitosamente.')
-
-            # Loguear automáticamente al usuario
             login(request, user)
             return redirect('dashboard')
 
@@ -489,7 +655,6 @@ def perfil_view(request):
     except PerfilUsuario.DoesNotExist:
         perfil = PerfilUsuario.objects.create(usuario=request.user)
 
-    # Asegurar que el carrito exista
     carrito, created = Carrito.objects.get_or_create(usuario=request.user)
 
     context = {
@@ -502,74 +667,50 @@ def perfil_view(request):
 @login_required
 @csrf_exempt
 def actualizar_perfil(request):
-    """Actualizar perfil de usuario vía AJAX - CORREGIDO"""
+    """Actualizar perfil de usuario vía AJAX"""
     if request.method == 'POST':
         try:
-            print("🔍 DEBUG: Iniciando actualización de perfil")
-            print(f"📋 POST data recibida: {dict(request.POST)}")
-
-            # Obtener o crear perfil
             perfil, created = PerfilUsuario.objects.get_or_create(usuario=request.user)
-            print(f"✅ Perfil obtenido: {perfil}")
-
-            # Actualizar datos del usuario
             user = request.user
 
-            # ✅ CAMBIOS PRINCIPALES: Obtener datos correctamente del POST
             first_name = request.POST.get('first_name', '').strip()
             last_name = request.POST.get('last_name', '').strip()
             email = request.POST.get('email', '').strip()
 
-            print(f"📝 Datos a actualizar: first_name='{first_name}', last_name='{last_name}', email='{email}'")
-
-            # Solo actualizar si hay valores
             if first_name:
                 user.first_name = first_name
             if last_name:
                 user.last_name = last_name
             if email:
-                # Validar email único
                 if User.objects.filter(email=email).exclude(id=user.id).exists():
-                    print(f"❌ Email duplicado: {email}")
                     return JsonResponse({
                         'success': False,
                         'message': 'Este email ya está en uso por otra cuenta'
                     })
                 user.email = email
 
-            # ✅ IMPORTANTE: Guardar el usuario primero
             user.save()
-            print(f"✅ Usuario actualizado: {user.first_name} {user.last_name} - {user.email}")
 
-            # Actualizar datos del perfil
             telefono = request.POST.get('telefono', '').strip()
             direccion = request.POST.get('direccion', '').strip()
             fecha_nacimiento = request.POST.get('fecha_nacimiento', '').strip()
 
-            print(f"📱 Perfil a actualizar: telefono='{telefono}', direccion='{direccion}', fecha='{fecha_nacimiento}'")
-
-            # Actualizar campos del perfil solo si hay valores
             if telefono:
                 perfil.telefono = telefono
             if direccion:
                 perfil.direccion = direccion
 
-            # Manejar fecha de nacimiento
             if fecha_nacimiento:
                 from datetime import datetime
                 try:
                     perfil.fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d').date()
-                    print(f"✅ Fecha actualizada: {perfil.fecha_nacimiento}")
-                except ValueError as e:
-                    print(f"❌ Error en fecha: {e}")
+                except ValueError:
                     return JsonResponse({
                         'success': False,
                         'message': 'Formato de fecha inválido'
                     })
 
-            # ✅ IMPORTANTE: Guardar el perfil
             perfil.save()
-            print(f"✅ Perfil actualizado: telefono={perfil.telefono}, direccion={perfil.direccion}")
 
             return JsonResponse({
                 'success': True,
@@ -584,7 +725,6 @@ def actualizar_perfil(request):
             })
 
         except Exception as e:
-            print(f"❌ Error actualizando perfil: {e}")
             return JsonResponse({
                 'success': False,
                 'message': f'Error al actualizar perfil: {str(e)}'
@@ -593,40 +733,65 @@ def actualizar_perfil(request):
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
 
+
 @login_required
 @csrf_exempt
 def cambiar_password(request):
-    """Cambiar contraseña del usuario vía AJAX"""
+    """Cambiar contraseña del usuario vía AJAX - CON VALIDACIONES ROBUSTAS"""
     if request.method == 'POST':
         try:
-            current_password = request.POST.get('current_password')
-            new_password1 = request.POST.get('new_password1')
-            new_password2 = request.POST.get('new_password2')
+            current_password = request.POST.get('current_password', '').strip()
+            new_password1 = request.POST.get('new_password1', '').strip()
+            new_password2 = request.POST.get('new_password2', '').strip()
 
-            # Validaciones
+            # ✅ VALIDACIONES MEJORADAS
+            errores = []
+
+            # Validar campos vacíos
             if not all([current_password, new_password1, new_password2]):
                 return JsonResponse({
                     'success': False,
                     'message': 'Todos los campos son obligatorios'
                 })
 
-            if new_password1 != new_password2:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Las nuevas contraseñas no coinciden'
-                })
-
-            if len(new_password1) < 8:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'La nueva contraseña debe tener al menos 8 caracteres'
-                })
-
-            # Verificar contraseña actual
+            # Verificar contraseña actual PRIMERO
             if not request.user.check_password(current_password):
                 return JsonResponse({
                     'success': False,
                     'message': 'La contraseña actual es incorrecta'
+                })
+
+            # ✅ VALIDACIONES DE CONTRASEÑA ROBUSTAS
+            if len(new_password1) < 8:
+                errores.append('La contraseña debe tener al menos 8 caracteres')
+
+            if new_password1.isdigit():
+                errores.append('La contraseña no puede ser solo números')
+
+            if new_password1.isalpha():
+                errores.append('La contraseña no puede ser solo letras')
+
+            if new_password1.lower() in ['12345678', 'password', 'contraseña', '11111111', 'qwerty123', 'abc12345']:
+                errores.append('La contraseña es demasiado común. Usa una más segura')
+
+            if not any(c.isalpha() for c in new_password1) or not any(c.isdigit() for c in new_password1):
+                errores.append('La contraseña debe contener letras y números')
+
+            if request.user.username.lower() in new_password1.lower():
+                errores.append('La contraseña no puede contener tu nombre de usuario')
+
+            if new_password1 == current_password:
+                errores.append('La nueva contraseña debe ser diferente a la actual')
+
+            # Validar que las contraseñas coincidan
+            if new_password1 != new_password2:
+                errores.append('Las nuevas contraseñas no coinciden')
+
+            # Si hay errores, retornar el primero
+            if errores:
+                return JsonResponse({
+                    'success': False,
+                    'message': errores[0]  # Mostrar el primer error
                 })
 
             # Cambiar contraseña
@@ -639,7 +804,7 @@ def cambiar_password(request):
 
             return JsonResponse({
                 'success': True,
-                'message': 'Contraseña cambiada exitosamente'
+                'message': '✅ Contraseña cambiada exitosamente'
             })
 
         except Exception as e:
@@ -650,61 +815,43 @@ def cambiar_password(request):
 
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
-
 # ====================== RECUPERACIÓN DE CONTRASEÑA POR EMAIL ======================
 
 def solicitar_recuperacion_password(request):
-    """Vista para solicitar recuperación de contraseña por email - CON DEBUGGING"""
+    """Vista para solicitar recuperación de contraseña por email"""
     if request.user.is_authenticated:
         return redirect('dashboard')
 
     if request.method == 'POST':
         email_or_username = request.POST.get('email_or_username')
 
-        # 🔍 DEBUGGING AGREGADO
-        print(f"🔍 DEBUG WEB: Formulario recibido con: '{email_or_username}'")
-
         if not email_or_username:
             messages.error(request, 'Por favor ingresa tu email o nombre de usuario')
             return render(request, 'auth/solicitar_recuperacion.html')
 
         try:
-            # Buscar usuario por email o username
             try:
                 if '@' in email_or_username:
                     user = User.objects.get(email=email_or_username)
-                    print(f"✅ DEBUG WEB: Usuario encontrado por EMAIL: {user.username} - {user.email}")
                 else:
                     user = User.objects.get(username=email_or_username)
-                    print(f"✅ DEBUG WEB: Usuario encontrado por USERNAME: {user.username} - {user.email}")
             except User.DoesNotExist:
-                print(f"❌ DEBUG WEB: Usuario NO encontrado: '{email_or_username}'")
-                # Por seguridad, no revelamos si el usuario existe o no
                 messages.success(request, 'Si el usuario existe, se ha enviado un email con instrucciones.')
                 return render(request, 'auth/solicitar_recuperacion.html')
 
-            # 🔍 DEBUGGING: Verificar email
             if not user.email:
-                print(f"❌ DEBUG WEB: Usuario {user.username} sin email")
                 messages.error(request, 'Este usuario no tiene email configurado.')
                 return render(request, 'auth/solicitar_recuperacion.html')
 
-            print(f"📧 DEBUG WEB: Email destino: {user.email}")
-
-            # Crear token de recuperación
             try:
                 token_obj = TokenRecuperacion.crear_token(user)
-                print(f"🔑 DEBUG WEB: Token creado: {token_obj.token}")
-            except Exception as token_error:
-                print(f"❌ DEBUG WEB: Error creando token: {token_error}")
+            except Exception:
                 messages.error(request, 'Error interno. Contacta al administrador.')
                 return render(request, 'auth/solicitar_recuperacion.html')
 
-            # Enviar email
             subject = 'Recuperación de contraseña - GAMERLY'
-
-            # Crear contexto para el template del email
             current_site = get_current_site(request)
+
             context = {
                 'user': user,
                 'domain': current_site.domain,
@@ -713,60 +860,35 @@ def solicitar_recuperacion_password(request):
                 'protocol': 'https' if request.is_secure() else 'http',
             }
 
-            print(f"🌐 DEBUG WEB: Contexto: {context}")
-
-            # Renderizar el email desde template
             try:
                 email_body = render_to_string('auth/email_recuperacion.html', context)
-                print(f"✅ DEBUG WEB: Template renderizado OK")
-                print(f"📄 DEBUG WEB: Primeros 100 caracteres: {email_body[:100]}...")
-            except Exception as template_error:
-                print(f"❌ DEBUG WEB: Error en template: {template_error}")
+            except Exception:
                 messages.error(request, 'Error interno del sistema.')
                 return render(request, 'auth/solicitar_recuperacion.html')
 
-            print(f"📤 DEBUG WEB: Enviando email...")
-            print(f"  - From: {settings.EMAIL_HOST_USER}")
-            print(f"  - To: {user.email}")
-            print(f"  - Subject: {subject}")
-
             try:
-                result = send_mail(
+                send_mail(
                     subject=subject,
                     message='Versión en texto plano: Para recuperar tu contraseña, usa el enlace en la versión HTML de este email.',
-                    from_email=settings.EMAIL_HOST_USER,  # Usar explícitamente
+                    from_email=settings.EMAIL_HOST_USER,
                     recipient_list=[user.email],
                     html_message=email_body,
                     fail_silently=False,
                 )
-
-                print(f"✅ DEBUG WEB: Email enviado! Resultado: {result}")
-
-                if result == 1:
-                    print("🎉 DEBUG WEB: Email enviado exitosamente")
-                    messages.success(request, 'Se ha enviado un email con instrucciones para recuperar tu contraseña.')
-                    return redirect('login')
-                else:
-                    print(f"⚠️ DEBUG WEB: Send_mail retornó: {result} (esperado: 1)")
-                    messages.error(request, 'Error al enviar email. Intenta nuevamente.')
-
-            except Exception as email_error:
-                print(f"❌ DEBUG WEB: Error enviando email: {type(email_error).__name__}: {email_error}")
-                print(f"🔧 DEBUG WEB: Configuración EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
-                print(f"🔧 DEBUG WEB: Configuración EMAIL_HOST: {settings.EMAIL_HOST}")
-                print(f"🔧 DEBUG WEB: Configuración EMAIL_PORT: {settings.EMAIL_PORT}")
+                messages.success(request, 'Se ha enviado un email con instrucciones para recuperar tu contraseña.')
+                return redirect('login')
+            except Exception:
                 messages.error(request, 'Error al enviar el email. Por favor intenta más tarde.')
                 return render(request, 'auth/solicitar_recuperacion.html')
 
-        except Exception as e:
-            print(f"❌ DEBUG WEB: Error general: {type(e).__name__}: {e}")
+        except Exception:
             messages.error(request, 'Error interno. Por favor intenta más tarde.')
 
     return render(request, 'auth/solicitar_recuperacion.html')
 
 
 def confirmar_recuperacion_password(request, token):
-    """Vista para confirmar y cambiar contraseña con token"""
+    """Vista para confirmar y cambiar contraseña con token - CORREGIDA"""
     if request.user.is_authenticated:
         return redirect('dashboard')
 
@@ -778,34 +900,50 @@ def confirmar_recuperacion_password(request, token):
             return redirect('solicitar_recuperacion_password')
 
         if request.method == 'POST':
-            new_password1 = request.POST.get('new_password1')
-            new_password2 = request.POST.get('new_password2')
+            new_password1 = request.POST.get('new_password1', '').strip()
+            new_password2 = request.POST.get('new_password2', '').strip()
 
-            # Validaciones
+            # ✅ VALIDACIONES MEJORADAS
+            errores = []
+
             if not new_password1 or not new_password2:
-                messages.error(request, 'Ambos campos son obligatorios')
-                return render(request, 'auth/confirmar_recuperacion.html', {'token': token})
+                errores.append('Ambos campos son obligatorios')
+            elif len(new_password1) < 8:
+                errores.append('La contraseña debe tener al menos 8 caracteres')
+            elif new_password1 != new_password2:
+                errores.append('Las contraseñas no coinciden')
+            elif new_password1.lower() in ['12345678', 'password', 'contraseña', '11111111']:
+                errores.append('La contraseña es demasiado común. Usa una más segura')
+            elif not any(c.isalpha() for c in new_password1) or not any(c.isdigit() for c in new_password1):
+                errores.append('La contraseña debe contener letras y números')
 
-            if new_password1 != new_password2:
-                messages.error(request, 'Las contraseñas no coinciden')
-                return render(request, 'auth/confirmar_recuperacion.html', {'token': token})
+            if errores:
+                for error in errores:
+                    messages.error(request, error)
+                return render(request, 'auth/confirmar_recuperacion.html', {
+                    'token': token,
+                    'usuario': token_obj.usuario
+                })
 
-            if len(new_password1) < 8:
-                messages.error(request, 'La contraseña debe tener al menos 8 caracteres')
-                return render(request, 'auth/confirmar_recuperacion.html', {'token': token})
+            try:
+                user = token_obj.usuario
+                user.set_password(new_password1)
+                user.save()
 
-            # Cambiar contraseña
-            user = token_obj.usuario
-            user.set_password(new_password1)
-            user.save()
+                token_obj.usado = True
+                token_obj.save()
 
-            # Marcar token como usado
-            token_obj.usado = True
-            token_obj.save()
+                messages.success(request, '¡Contraseña cambiada exitosamente! Ya puedes iniciar sesión.')
+                return redirect('login')
 
-            messages.success(request, '¡Contraseña cambiada exitosamente! Ya puedes iniciar sesión.')
-            return redirect('login')
+            except Exception as e:
+                messages.error(request, 'Error al cambiar la contraseña. Intenta nuevamente.')
+                return render(request, 'auth/confirmar_recuperacion.html', {
+                    'token': token,
+                    'usuario': token_obj.usuario
+                })
 
+        # ✅ GET request - AHORA CON usuario EN EL CONTEXTO
         return render(request, 'auth/confirmar_recuperacion.html', {
             'token': token,
             'usuario': token_obj.usuario
@@ -813,6 +951,9 @@ def confirmar_recuperacion_password(request, token):
 
     except TokenRecuperacion.DoesNotExist:
         messages.error(request, 'Enlace inválido o expirado.')
+        return redirect('solicitar_recuperacion_password')
+    except Exception:
+        messages.error(request, 'Error al procesar la solicitud.')
         return redirect('solicitar_recuperacion_password')
 
 
@@ -827,7 +968,6 @@ def recuperar_password_view(request):
         new_password1 = request.POST.get('new_password1')
         new_password2 = request.POST.get('new_password2')
 
-        # Validaciones
         if not all([username, current_password, new_password1, new_password2]):
             messages.error(request, 'Todos los campos son obligatorios')
             return render(request, 'recuperar_password.html')
@@ -841,15 +981,12 @@ def recuperar_password_view(request):
             return render(request, 'recuperar_password.html')
 
         try:
-            # Verificar que el usuario existe
             user = User.objects.get(username=username)
 
-            # Verificar contraseña actual
             if not user.check_password(current_password):
                 messages.error(request, 'La contraseña actual es incorrecta')
                 return render(request, 'recuperar_password.html')
 
-            # Cambiar contraseña
             user.set_password(new_password1)
             user.save()
 
@@ -879,7 +1016,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
         return ProductoSerializer
 
     def get_permissions(self):
-        """Permisos: clientes solo pueden ver, admins pueden todo"""
         if self.action in ['list', 'retrieve']:
             permission_classes = [IsAuthenticated]
         else:
@@ -889,7 +1025,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        # Filtrar por estado si es cliente
         if not self.request.user.is_superuser:
             try:
                 perfil = self.request.user.perfilusuario
@@ -898,7 +1033,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
             except PerfilUsuario.DoesNotExist:
                 queryset = queryset.filter(estado='disponible')
 
-        # Filtros opcionales
         categoria = self.request.query_params.get('categoria')
         if categoria:
             queryset = queryset.filter(categoria_id=categoria)
@@ -911,7 +1045,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def destacados(self, request):
-        """Endpoint para productos destacados"""
         productos = self.get_queryset().filter(destacado=True, estado='disponible')[:6]
         serializer = ProductoListSerializer(productos, many=True)
         return Response(serializer.data)
@@ -932,7 +1065,6 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        # Solo mostrar categorías activas a los clientes
         if not self.request.user.is_superuser:
             try:
                 perfil = self.request.user.perfilusuario
@@ -994,13 +1126,11 @@ def detalle_producto(request, producto_id):
     """Vista de detalle de un producto específico"""
     producto = get_object_or_404(Producto, id=producto_id, estado='disponible')
 
-    # Productos relacionados de la misma categoría (excluyendo el actual)
     productos_relacionados = Producto.objects.filter(
         categoria=producto.categoria,
         estado='disponible'
     ).exclude(id=producto.id)[:4]
 
-    # Asegurar que el carrito exista si el usuario está autenticado
     carrito = None
     if request.user.is_authenticated:
         carrito, created = Carrito.objects.get_or_create(usuario=request.user)

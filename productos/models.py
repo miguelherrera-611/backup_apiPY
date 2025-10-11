@@ -244,3 +244,38 @@ def crear_carrito_usuario(sender, instance, created, **kwargs):
     """Crear carrito automáticamente cuando se crea un usuario"""
     if created:
         Carrito.objects.create(usuario=instance)
+
+
+class TokenLogin(models.Model):
+    """Token de verificación para login de dos factores"""
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=6)  # 6 dígitos
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    usado = models.BooleanField(default=False)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Token para {self.usuario.username} - {self.token}"
+
+    def es_valido(self):
+        """Verifica si el token es válido (no expirado y no usado)"""
+        if self.usado:
+            return False
+        # Token expira en 10 minutos
+        expiracion = self.fecha_creacion + timedelta(minutes=10)
+        return timezone.now() < expiracion
+
+    @classmethod
+    def crear_token(cls, usuario, ip_address=None):
+        """Crea un token de 6 dígitos para el usuario"""
+        import random
+        # Eliminar tokens anteriores del usuario
+        cls.objects.filter(usuario=usuario, usado=False).delete()
+
+        # Generar token de 6 dígitos
+        token = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        return cls.objects.create(usuario=usuario, token=token, ip_address=ip_address)
+
+    class Meta:
+        verbose_name = "Token de Login"
+        verbose_name_plural = "Tokens de Login"

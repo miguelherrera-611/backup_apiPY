@@ -48,4 +48,8 @@ urlpatterns = [
     path('api/carrito-info/', views.carrito_info, name='carrito_info'),
     path('api/estadisticas/', views.estadisticas_publicas, name='estadisticas_publicas'),
     path('api-auth/', include('rest_framework.urls')),
+
+    # Login con 2FA
+    path('verificar-token/', views.verificar_token_login, name='verificar_token_login'),
+    path('reenviar-token/', views.reenviar_token_login, name='reenviar_token_login'),
 ]

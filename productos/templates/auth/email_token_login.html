@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: linear-gradient(145deg, #1a1a1a, #2a2a2a); border: 2px solid #8b5cf6; border-radius: 15px; padding: 30px; }
+        .header { text-align: center; padding: 20px; background: linear-gradient(45deg, #8b5cf6, #a855f7); border-radius: 10px; margin-bottom: 30px; }
+        .header h1 { color: white; margin: 0; font-size: 2rem; }
+        .token-box { background: linear-gradient(45deg, #8b5cf6, #a855f7); padding: 30px; border-radius: 15px; text-align: center; margin: 30px 0; }
+        .token { font-size: 3rem; font-weight: bold; letter-spacing: 10px; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        .warning { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .info { background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 15px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 GAMERLY</h1>
+            <p style="color: #f0f0f0; margin: 0;">Verificación de Inicio de Sesión</p>
+        </div>
+
+        <p style="font-size: 1.2rem;">Hola <strong>{{ user.first_name|default:user.username }}</strong>,</p>
+
+        <p>Alguien intentó iniciar sesión en tu cuenta de GAMERLY. Si fuiste tú, usa este código para continuar:</p>
+
+        <div class="token-box">
+            <div style="color: white; margin-bottom: 10px; font-size: 1.2rem;">Tu código de verificación es:</div>
+            <div class="token">{{ token }}</div>
+            <small style="color: rgba(255,255,255,0.8);">Válido por 10 minutos</small>
+        </div>
+
+        <div class="info">
+            <p><strong>📍 Información del intento de acceso:</strong></p>
+            <ul style="list-style: none; padding: 0;">
+                <li>🕐 Fecha: Ahora</li>
+                <li>🌐 IP: {{ ip_address|default:"Desconocida" }}</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h3 style="color: #ef4444; margin-top: 0;">⚠️ Importante - Seguridad</h3>
+            <ul style="padding-left: 20px;">
+                <li>Este código expira en <strong>10 minutos</strong></li>
+                <li>Solo puedes usarlo <strong>una vez</strong></li>
+                <li><strong>Nunca compartas</strong> este código con nadie</li>
+                <li>Si no intentaste iniciar sesión, <strong>ignora este email</strong> y cambia tu contraseña</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #8b5cf6;">
+            <p style="color: #8b5cf6; font-size: 1.2rem; margin: 0;"><strong>🎮 GAMERLY</strong></p>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">"Juega mejor. Vive Gamerly"</p>
+        </div>
+    </div>
+</body>
+</html>
