@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block title %}Dashboard Admin - Mi Tienda{% endblock %}
@@ -71,6 +70,15 @@
 .table .badge {
     font-weight: 700 !important;
     box-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Badge de ID visible */
+.table .badge.bg-secondary {
+    background: linear-gradient(45deg, #6c757d, #545b62) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
 }
 
 /* Bordes gaming */
@@ -235,6 +243,203 @@
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+
+/* Botones de Accesos Rápidos - SIN cambio a morado en hover */
+.card-body .btn-outline-primary,
+.card-body .btn-outline-info,
+.card-body .btn-outline-warning,
+.card-body .btn-outline-secondary {
+    font-weight: 700 !important;
+    transition: all 0.3s ease !important;
+}
+
+.card-body .btn-outline-primary:hover {
+    background: linear-gradient(45deg, #0d6efd, #0a58ca) !important;
+    color: #ffffff !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.5) !important;
+    border-color: #0d6efd !important;
+}
+
+.card-body .btn-outline-info:hover {
+    background: linear-gradient(45deg, #0dcaf0, #0aa2c0) !important;
+    color: #000000 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(13, 202, 240, 0.5) !important;
+    border-color: #0dcaf0 !important;
+}
+
+.card-body .btn-outline-warning:hover {
+    background: linear-gradient(45deg, #ffc107, #cc9a06) !important;
+    color: #000000 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.5) !important;
+    border-color: #ffc107 !important;
+}
+
+.card-body .btn-outline-secondary:hover {
+    background: linear-gradient(45deg, #6c757d, #545b62) !important;
+    color: #ffffff !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(108, 117, 125, 0.5) !important;
+    border-color: #6c757d !important;
+}
+
+/* ============================================ */
+/* MODO CLARO - CORRECCIONES ESPECÍFICAS */
+/* ============================================ */
+
+body.light-mode .table {
+    background-color: #ffffff !important;
+}
+
+body.light-mode .table tbody tr td,
+body.light-mode .table tbody tr td strong,
+body.light-mode .table tbody tr td div,
+body.light-mode .table tbody tr td span,
+body.light-mode .table tbody tr td small {
+    color: #212529 !important;
+    background-color: #ffffff !important;
+}
+
+body.light-mode .table tbody tr td .text-muted {
+    color: #6c757d !important;
+}
+
+body.light-mode .table thead tr th {
+    color: #ffffff !important;
+    background-color: #8b5cf6 !important;
+}
+
+body.light-mode .table tbody tr {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+body.light-mode .table tbody tr:hover {
+    background-color: rgba(139, 92, 246, 0.1) !important;
+}
+
+body.light-mode .table tbody tr:hover td {
+    background-color: rgba(139, 92, 246, 0.1) !important;
+    color: #212529 !important;
+}
+
+body.light-mode .table {
+    border: 2px solid #8b5cf6 !important;
+}
+
+body.light-mode .table td,
+body.light-mode .table th {
+    border-color: #dee2e6 !important;
+}
+
+/* Modal en modo claro */
+body.light-mode .modal-content {
+    background: #ffffff !important;
+}
+
+body.light-mode .modal-body {
+    background: #ffffff !important;
+    color: #212529 !important;
+}
+
+body.light-mode .modal-footer {
+    background: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+body.light-mode .modal .form-label {
+    color: #212529 !important;
+    text-shadow: none !important;
+}
+
+body.light-mode .modal .form-control,
+body.light-mode .modal .form-select {
+    background: #ffffff !important;
+    border: 2px solid #8b5cf6 !important;
+    color: #212529 !important;
+}
+
+body.light-mode .modal .form-control:focus,
+body.light-mode .modal .form-select:focus {
+    background: #ffffff !important;
+    border-color: #c084fc !important;
+    color: #212529 !important;
+}
+
+body.light-mode .modal .form-control::placeholder {
+    color: #6c757d !important;
+}
+
+body.light-mode .modal .input-group-text {
+    background: rgba(139, 92, 246, 0.8) !important;
+    border: 2px solid #8b5cf6 !important;
+    color: #ffffff !important;
+}
+
+body.light-mode .modal .form-check-input {
+    background-color: #ffffff !important;
+    border: 2px solid #8b5cf6 !important;
+}
+
+body.light-mode .modal .form-check-input:checked {
+    background-color: #8b5cf6 !important;
+}
+
+body.light-mode .modal .form-check-label {
+    color: #212529 !important;
+}
+
+/* Cards en modo claro */
+body.light-mode .card {
+    background: #ffffff !important;
+    color: #212529 !important;
+}
+
+body.light-mode .card-header {
+    color: #212529 !important;
+}
+
+body.light-mode .card-body {
+    color: #212529 !important;
+}
+
+body.light-mode .text-muted {
+    color: #6c757d !important;
+}
+
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode h5,
+body.light-mode h6 {
+    color: #8b5cf6 !important;
+}
+
+body.light-mode .text-white {
+    color: #212529 !important;
+}
+
+body.light-mode .text-white-50 {
+    color: #6c757d !important;
+}
+
+/* Badge de ID en modo claro */
+body.light-mode .table .badge.bg-secondary {
+    background: linear-gradient(45deg, #6c757d, #545b62) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* Botones de Accesos Rápidos en modo claro */
+body.light-mode .card-body .btn-outline-primary,
+body.light-mode .card-body .btn-outline-info,
+body.light-mode .card-body .btn-outline-warning,
+body.light-mode .card-body .btn-outline-secondary {
+    font-weight: 700 !important;
 }
 </style>
 
