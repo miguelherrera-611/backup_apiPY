@@ -5,6 +5,228 @@
 {% block content %}
 {% csrf_token %}
 
+<style>
+/* ===== ESTILOS PARA BOTONES DEL RESUMEN ===== */
+.card-body .btn:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
+}
+
+/* ===== MODAL DE CONFIRMACIÓN PERSONALIZADO ===== */
+.modal-confirmacion {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-confirmacion.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-confirmacion-content {
+    background: linear-gradient(145deg, rgba(26, 26, 26, 0.98), rgba(42, 42, 42, 0.95));
+    border: 2px solid var(--gaming-purple);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4);
+    animation: slideUp 0.3s ease;
+    position: relative;
+}
+
+.modal-confirmacion-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-confirmacion-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.modal-confirmacion-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.modal-confirmacion-body {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.modal-confirmacion-producto {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 15px;
+    color: var(--gaming-neon);
+    font-weight: 600;
+}
+
+.modal-confirmacion-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.modal-confirmacion-btn {
+    padding: 12px 30px;
+    border-radius: 25px;
+    border: none;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-confirmacion-btn-cancelar {
+    background: linear-gradient(45deg, #6b7280, #4b5563);
+    color: white;
+    border: 2px solid #6b7280;
+}
+
+.modal-confirmacion-btn-cancelar:hover {
+    background: linear-gradient(45deg, #4b5563, #374151);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(107, 114, 128, 0.5);
+}
+
+.modal-confirmacion-btn-confirmar {
+    background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+    color: white;
+    border: 2px solid var(--gaming-danger);
+}
+
+.modal-confirmacion-btn-confirmar:hover {
+    background: linear-gradient(45deg, #dc2626, #b91c1c);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== OCULTAR FLECHAS DEL INPUT NUMBER ===== */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Mejorar estilo de los inputs de cantidad */
+input[type="number"].qty-input {
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 0;
+    background: rgba(26, 26, 26, 0.8) !important;
+    color: white !important;
+    border: 2px solid var(--gaming-purple) !important;
+    border-radius: 8px;
+    cursor: default;
+}
+
+input[type="number"].qty-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    border-color: var(--gaming-neon) !important;
+}
+
+/* Botones de cantidad cuadrados */
+.btn-qty {
+    width: 35px !important;
+    height: 35px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 2px solid var(--gaming-purple) !important;
+    color: var(--gaming-purple) !important;
+    background: rgba(26, 26, 26, 0.8) !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    font-size: 14px !important;
+}
+
+.btn-qty:hover:not(:disabled) {
+    background: var(--gaming-purple) !important;
+    color: white !important;
+    border-color: var(--gaming-neon) !important;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6) !important;
+    transform: scale(1.05);
+}
+
+.btn-qty:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.btn-qty:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+.btn-qty i {
+    font-size: 12px;
+}
+
+/* Contenedor de cantidad */
+.d-flex.gap-2 {
+    gap: 8px !important;
+}
+
+/* Efecto de procesando */
+.processing {
+    opacity: 0.6;
+    pointer-events: none;
+}
+</style>
+
 <!-- Header del Carrito -->
 <div class="row mb-4">
     <div class="col-md-8">
@@ -23,6 +245,30 @@
 </div>
 
 {% if items %}
+    <!-- Modal de Confirmación Personalizado -->
+    <div class="modal-confirmacion" id="modalConfirmacion">
+        <div class="modal-confirmacion-content">
+            <div class="modal-confirmacion-header">
+                <div class="modal-confirmacion-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="modal-confirmacion-title">Confirmar Eliminación</h3>
+            </div>
+            <div class="modal-confirmacion-body">
+                <p>¿Estás seguro de que deseas eliminar este producto del carrito?</p>
+                <div class="modal-confirmacion-producto" id="modalProductoNombre"></div>
+            </div>
+            <div class="modal-confirmacion-actions">
+                <button class="modal-confirmacion-btn modal-confirmacion-btn-cancelar" onclick="cerrarModalConfirmacion()">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button class="modal-confirmacion-btn modal-confirmacion-btn-confirmar" id="btnConfirmarEliminar">
+                    <i class="fas fa-trash me-2"></i>Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Lista de productos en el carrito -->
         <div class="col-lg-8">
@@ -69,22 +315,35 @@
                                     </strong>
                                 </div>
 
-                                <!-- Cantidad -->
+                                <!-- Cantidad - ✅ VERSIÓN MEJORADA -->
                                 <div class="col-md-2">
-                                    <div class="input-group input-group-sm">
-                                        <button class="btn btn-outline-secondary"
-                                                onclick="cambiarCantidad({{ item.id }}, {{ item.cantidad }} - 1)">
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <!-- Botón Disminuir -->
+                                        <button class="btn btn-outline-secondary btn-qty"
+                                                type="button"
+                                                data-item-id="{{ item.id }}"
+                                                onclick="cambiarCantidad({{ item.id }}, parseInt(document.getElementById('qty-{{ item.id }}').value) - 1)"
+                                                style="width: 35px; height: 35px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-minus"></i>
                                         </button>
+
+                                        <!-- Input de cantidad -->
                                         <input type="number"
-                                               class="form-control text-center"
+                                               class="form-control text-center qty-input"
                                                id="qty-{{ item.id }}"
                                                value="{{ item.cantidad }}"
                                                min="1"
                                                max="{{ item.producto.stock }}"
-                                               onchange="cambiarCantidad({{ item.id }}, this.value)">
-                                        <button class="btn btn-outline-secondary"
-                                                onclick="cambiarCantidad({{ item.id }}, {{ item.cantidad }} + 1)">
+                                               data-default="{{ item.cantidad }}"
+                                               readonly
+                                               style="width: 60px; height: 35px; font-size: 16px; font-weight: 700; border: 2px solid var(--gaming-purple);">
+
+                                        <!-- Botón Aumentar -->
+                                        <button class="btn btn-outline-secondary btn-qty"
+                                                type="button"
+                                                data-item-id="{{ item.id }}"
+                                                onclick="cambiarCantidad({{ item.id }}, parseInt(document.getElementById('qty-{{ item.id }}').value) + 1)"
+                                                style="width: 35px; height: 35px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-plus"></i>
                                         </button>
                                     </div>
@@ -94,9 +353,10 @@
                                 <div class="col-md-3 text-end">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <strong class="text-success" id="subtotal-{{ item.id }}">
-                                            ${{ item.subtotal }}
+                                            ${{ item.subtotal|floatformat:0 }}
                                         </strong>
                                         <button class="btn btn-outline-danger btn-sm ms-2"
+                                                data-item-id="{{ item.id }}"
                                                 onclick="eliminarItem({{ item.id }})"
                                                 title="Eliminar producto">
                                             <i class="fas fa-trash"></i>
@@ -113,8 +373,8 @@
         <!-- Resumen del carrito -->
         <div class="col-lg-4">
             <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
+                <div class="card-header text-white" style="background: linear-gradient(45deg, #8b5cf6, #a855f7) !important; border: none;">
+                    <h5 class="mb-0" style="color: white !important;">
                         <i class="fas fa-calculator me-2"></i>
                         Resumen del Pedido
                     </h5>
@@ -128,12 +388,12 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button class="btn btn-success btn-lg" onclick="procederPago()">
+                        <button class="btn btn-lg" onclick="procederPago()" style="background: var(--gaming-purple) !important; color: white !important; border: none !important; border-radius: 25px !important; font-weight: 700 !important; transition: all 0.3s ease !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;">
                             <i class="fas fa-credit-card me-2"></i>
                             Proceder al Pago
                         </button>
 
-                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+                        <a href="{% url 'dashboard' %}" class="btn btn-lg" style="background: var(--gaming-purple) !important; color: white !important; border: none !important; border-radius: 25px !important; font-weight: 700 !important; transition: all 0.3s ease !important; text-decoration: none !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;">
                             <i class="fas fa-arrow-left me-2"></i>
                             Seguir Comprando
                         </a>
@@ -163,6 +423,332 @@
 
 {% block extra_js %}
 <script>
+// ===== FUNCIÓN PRINCIPAL: CAMBIAR CANTIDAD =====
+function cambiarCantidad(itemId, nuevaCantidad) {
+    // ✅ Convertir a número entero
+    nuevaCantidad = parseInt(nuevaCantidad);
+
+    // ✅ Obtener el input
+    const input = document.getElementById(`qty-${itemId}`);
+    if (!input) {
+        console.error('Input no encontrado:', itemId);
+        return;
+    }
+
+    // ✅ Obtener límites
+    const min = parseInt(input.getAttribute('min')) || 1;
+    const max = parseInt(input.getAttribute('max')) || 999;
+
+    // ✅ Validación robusta
+    if (isNaN(nuevaCantidad)) {
+        alert('Por favor ingresa un número válido');
+        input.value = input.getAttribute('data-default') || min;
+        return;
+    }
+
+    if (nuevaCantidad < min) {
+        alert('La cantidad debe ser mayor a 0');
+        input.value = input.getAttribute('data-default') || min;
+        return;
+    }
+
+    if (nuevaCantidad > max) {
+        alert(`Solo hay ${max} unidades disponibles`);
+        input.value = input.getAttribute('data-default') || min;
+        return;
+    }
+
+    // ✅ Obtener CSRF token
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        alert('Error: Token de seguridad no encontrado. Recarga la página.');
+        return;
+    }
+
+    // ✅ Deshabilitar controles mientras se procesa
+    const itemElement = document.getElementById(`item-${itemId}`);
+    if (itemElement) {
+        itemElement.classList.add('processing');
+    }
+
+    const botones = itemElement.querySelectorAll('button');
+    botones.forEach(btn => btn.disabled = true);
+
+    // ✅ Enviar petición AJAX
+    fetch(`/ajax/carrito/actualizar/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            cantidad: nuevaCantidad
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // ✅ Actualizar input
+            input.value = nuevaCantidad;
+            input.setAttribute('data-default', nuevaCantidad);
+
+            // ✅ Actualizar subtotal
+            const subtotalElem = document.getElementById(`subtotal-${itemId}`);
+            if (subtotalElem) {
+                subtotalElem.textContent = `$${data.item_subtotal}`;
+            }
+
+            // ✅ Actualizar totales
+            actualizarTotales(data.carrito_items, data.carrito_total);
+
+            // ✅ NO mostrar mensaje - actualización silenciosa
+            // mostrarMensaje(data.message, 'success');
+        } else {
+            // ✅ Restaurar valor anterior en caso de error
+            input.value = input.getAttribute('data-default') || min;
+            mostrarMensaje(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+
+        // ✅ Restaurar valor anterior
+        input.value = input.getAttribute('data-default') || min;
+
+        mostrarMensaje('Error al actualizar cantidad', 'error');
+    })
+    .finally(() => {
+        // ✅ Re-habilitar controles
+        if (itemElement) {
+            itemElement.classList.remove('processing');
+        }
+        botones.forEach(btn => btn.disabled = false);
+    });
+}
+
+// ===== FUNCIÓN: ELIMINAR ITEM =====
+function eliminarItem(itemId) {
+    // Obtener nombre del producto
+    const itemElement = document.getElementById(`item-${itemId}`);
+    const nombreElement = itemElement ? itemElement.querySelector('h6') : null;
+    const nombreProducto = nombreElement ? nombreElement.textContent : 'este producto';
+
+    // Mostrar modal personalizado
+    mostrarModalConfirmacion(itemId, nombreProducto);
+}
+
+function mostrarModalConfirmacion(itemId, nombreProducto) {
+    const modal = document.getElementById('modalConfirmacion');
+    const productoNombreElement = document.getElementById('modalProductoNombre');
+    const btnConfirmar = document.getElementById('btnConfirmarEliminar');
+
+    // Actualizar nombre del producto
+    productoNombreElement.innerHTML = `<i class="fas fa-box me-2"></i>${nombreProducto}`;
+
+    // Mostrar modal
+    modal.classList.add('show');
+
+    // ✅ Configurar botón de confirmar con el itemId correcto
+    btnConfirmar.onclick = function() {
+        confirmarEliminarItem(itemId, nombreProducto);
+    };
+}
+
+function cerrarModalConfirmacion() {
+    const modal = document.getElementById('modalConfirmacion');
+    modal.classList.remove('show');
+}
+
+function confirmarEliminarItem(itemId, nombreProducto) {
+    console.log('🗑️ Eliminando item:', itemId); // Debug
+
+    if (!itemId) {
+        console.error('❌ itemId es null o undefined');
+        mostrarMensaje('Error: ID de producto inválido', 'error');
+        cerrarModalConfirmacion();
+        return;
+    }
+
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        alert('Error: Token de seguridad no encontrado. Recarga la página.');
+        cerrarModalConfirmacion();
+        return;
+    }
+
+    // Cerrar modal
+    cerrarModalConfirmacion();
+
+    fetch(`/ajax/carrito/eliminar/${itemId}/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => {
+        console.log('📡 Response status:', response.status); // Debug
+        return response.json();
+    })
+    .then(data => {
+        console.log('📦 Response data:', data); // Debug
+
+        if (data.success) {
+            // Eliminar el elemento del DOM con animación
+            const itemElement = document.getElementById(`item-${itemId}`);
+            if (itemElement) {
+                itemElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                itemElement.style.opacity = '0';
+                itemElement.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    itemElement.remove();
+
+                    // Si el carrito está vacío, recargar la página
+                    if (data.carrito_items === 0) {
+                        location.reload();
+                    }
+                }, 300);
+            }
+
+            // Actualizar totales
+            actualizarTotales(data.carrito_items, data.carrito_total);
+
+            // Mostrar mensaje de éxito
+            mostrarMensaje(`${nombreProducto} eliminado del carrito`, 'success');
+        } else {
+            mostrarMensaje(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error al eliminar:', error);
+        mostrarMensaje('Error al eliminar producto', 'error');
+    });
+}
+
+// ===== FUNCIÓN: LIMPIAR TODO EL CARRITO =====
+function limpiarTodoCarrito() {
+    mostrarModalConfirmacionLimpiar();
+}
+
+function mostrarModalConfirmacionLimpiar() {
+    // Crear modal temporal para limpiar carrito
+    const modalHTML = `
+        <div class="modal-confirmacion show" id="modalLimpiarCarrito">
+            <div class="modal-confirmacion-content">
+                <div class="modal-confirmacion-header">
+                    <div class="modal-confirmacion-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="modal-confirmacion-title">Vaciar Carrito</h3>
+                </div>
+                <div class="modal-confirmacion-body">
+                    <p>¿Estás seguro de que deseas vaciar todo el carrito?</p>
+                    <div class="modal-confirmacion-producto">
+                        <i class="fas fa-trash me-2"></i>Se eliminarán todos los productos
+                    </div>
+                </div>
+                <div class="modal-confirmacion-actions">
+                    <button class="modal-confirmacion-btn modal-confirmacion-btn-cancelar" onclick="cerrarModalLimpiar()">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button class="modal-confirmacion-btn modal-confirmacion-btn-confirmar" onclick="confirmarLimpiarCarrito()">
+                        <i class="fas fa-trash me-2"></i>Vaciar Todo
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Insertar modal en el body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function cerrarModalLimpiar() {
+    const modal = document.getElementById('modalLimpiarCarrito');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+function confirmarLimpiarCarrito() {
+    cerrarModalLimpiar();
+
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        alert('Error: Token de seguridad no encontrado. Recarga la página.');
+        return;
+    }
+
+    fetch('/ajax/carrito/limpiar/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Recargar la página para mostrar el carrito vacío
+            location.reload();
+        } else {
+            mostrarMensaje(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarMensaje('Error al limpiar carrito', 'error');
+    });
+}
+
+// ===== FUNCIÓN: ACTUALIZAR TOTALES =====
+function actualizarTotales(totalItems, totalPrecio) {
+    // Actualizar badge del carrito en la navbar
+    const badge = document.getElementById('carritoBadge');
+    if (badge) {
+        badge.textContent = totalItems;
+    }
+
+    // Actualizar total en el header
+    const headerTotal = document.getElementById('totalItemsHeader');
+    if (headerTotal) {
+        headerTotal.textContent = totalItems;
+    }
+
+    // Actualizar total en el resumen
+    const resumenTotal = document.getElementById('carritoTotalResumen');
+    if (resumenTotal) {
+        resumenTotal.textContent = `$${totalPrecio}`;
+    }
+}
+
+// ===== FUNCIÓN: PROCEDER AL PAGO =====
+function procederPago() {
+    alert('Funcionalidad de pago en desarrollo...\n\nEn una implementación real, aquí se redigiría al sistema de pagos.');
+}
+
+// ===== FUNCIÓN: MOSTRAR MENSAJE =====
+function mostrarMensaje(mensaje, tipo) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-info-circle me-2"></i>
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    const main = document.querySelector('main .container');
+    main.insertBefore(alertDiv, main.firstChild);
+
+    // Auto-cerrar después de 5 segundos
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 150);
+        }
+    }, 5000);
+}
+
+// ===== FUNCIÓN: OBTENER CSRF TOKEN =====
 function getCsrfToken() {
     const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
     if (csrfInput) {
@@ -182,167 +768,48 @@ function getCsrfToken() {
     return null;
 }
 
-function cambiarCantidad(itemId, nuevaCantidad) {
-    nuevaCantidad = parseInt(nuevaCantidad);
-
-    if (nuevaCantidad < 1) {
-        alert('La cantidad debe ser mayor a 0');
-        return;
-    }
-
-    const csrfToken = getCsrfToken();
-    if (!csrfToken) {
-        alert('Error: Token de seguridad no encontrado. Recarga la página.');
-        return;
-    }
-
-    fetch(`/ajax/carrito/actualizar/${itemId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({
-            cantidad: nuevaCantidad
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Actualizar cantidad en el input
-            document.getElementById(`qty-${itemId}`).value = nuevaCantidad;
-
-            // Actualizar subtotal
-            document.getElementById(`subtotal-${itemId}`).textContent = `$${data.item_subtotal}`;
-
-            // Actualizar totales
-            actualizarTotales(data.carrito_items, data.carrito_total);
-
-            mostrarMensaje(data.message, 'success');
-        } else {
-            mostrarMensaje(data.message, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        mostrarMensaje('Error al actualizar cantidad', 'error');
-    });
-}
-
-function eliminarItem(itemId) {
-    if (confirm('¿Eliminar este producto del carrito?')) {
-        const csrfToken = getCsrfToken();
-        if (!csrfToken) {
-            alert('Error: Token de seguridad no encontrado. Recarga la página.');
-            return;
-        }
-
-        fetch(`/ajax/carrito/eliminar/${itemId}/`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': csrfToken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Eliminar el elemento del DOM
-                document.getElementById(`item-${itemId}`).remove();
-
-                // Actualizar totales
-                actualizarTotales(data.carrito_items, data.carrito_total);
-
-                // Si el carrito está vacío, recargar la página
-                if (data.carrito_items === 0) {
-                    location.reload();
-                }
-
-                mostrarMensaje(data.message, 'success');
-            } else {
-                mostrarMensaje(data.message, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarMensaje('Error al eliminar producto', 'error');
-        });
-    }
-}
-
-function limpiarTodoCarrito() {
-    if (confirm('¿Estás seguro de que deseas vaciar todo el carrito?')) {
-        const csrfToken = getCsrfToken();
-        if (!csrfToken) {
-            alert('Error: Token de seguridad no encontrado. Recarga la página.');
-            return;
-        }
-
-        fetch('/ajax/carrito/limpiar/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                mostrarMensaje(data.message, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarMensaje('Error al limpiar carrito', 'error');
-        });
-    }
-}
-
-function actualizarTotales(totalItems, totalPrecio) {
-    // Actualizar badge del carrito en la navbar
-    const badge = document.getElementById('carritoBadge');
-    if (badge) {
-        badge.textContent = totalItems;
-    }
-
-    // Actualizar total en el header
-    document.getElementById('totalItemsHeader').textContent = totalItems;
-
-    // Actualizar total en el resumen
-    document.getElementById('carritoTotalResumen').textContent = `$${totalPrecio}`;
-}
-
-function procederPago() {
-    alert('Funcionalidad de pago en desarrollo...\n\nEn una implementación real, aquí se redigiría al sistema de pagos.');
-}
-
-function mostrarMensaje(mensaje, tipo) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
-    alertDiv.innerHTML = `
-        <i class="fas fa-info-circle me-2"></i>
-        ${mensaje}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-
-    const main = document.querySelector('main .container');
-    main.insertBefore(alertDiv, main.firstChild);
-
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 5000);
-}
-
-// Debug: Verificar que el CSRF token esté disponible
+// ===== INICIALIZACIÓN AL CARGAR LA PÁGINA =====
 document.addEventListener('DOMContentLoaded', function() {
+    // ✅ Verificar CSRF token
     const csrfToken = getCsrfToken();
     if (!csrfToken) {
         console.error('⚠️ CSRF token no encontrado al cargar la página');
     } else {
         console.log('✅ CSRF token encontrado correctamente');
     }
+
+    // ✅ Guardar valores por defecto de los inputs
+    const inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(input => {
+        input.setAttribute('data-default', input.value);
+    });
+
+    // ✅ Prevenir scroll con rueda del mouse en inputs number
+    inputs.forEach(input => {
+        input.addEventListener('wheel', function(e) {
+            e.preventDefault();
+        });
+    });
+
+    // ✅ Cerrar modal al hacer clic fuera
+    const modal = document.getElementById('modalConfirmacion');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                cerrarModalConfirmacion();
+            }
+        });
+    }
+
+    // ✅ Cerrar modal con tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarModalConfirmacion();
+            cerrarModalLimpiar();
+        }
+    });
+
+    console.log('🛒 Carrito inicializado correctamente');
 });
 </script>
 {% endblock %}

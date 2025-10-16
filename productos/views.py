@@ -42,12 +42,7 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-
-
-
-
-"""login por token"""
-
+# ====================== LOGIN CON 2FA ======================
 
 def login_view(request):
     """Vista de login con 2FA por email"""
@@ -196,15 +191,7 @@ def reenviar_token_login(request):
         return JsonResponse({'success': False, 'message': 'Error al reenviar código'})
 
 
-
-
-
-
-
-
-
-"""login for token"""
-
+# ====================== DASHBOARD ======================
 
 @login_required
 def dashboard(request):
@@ -229,7 +216,7 @@ def dashboard(request):
 
         context = {
             'es_admin': True,
-            'productos': productos[:10],  # Últimos 10
+            'productos': productos[:10],
             'total_productos': total_productos,
             'productos_disponibles': productos_disponibles,
             'productos_agotados': productos_agotados,
@@ -392,7 +379,7 @@ def agregar_al_carrito(request):
                 'success': True,
                 'message': f'{producto.nombre} agregado al carrito',
                 'carrito_items': carrito.total_items(),
-                'carrito_total': float(carrito.total_precio())
+                'carrito_total': int(carrito.total_precio())
             })
 
         except Exception as e:
@@ -412,6 +399,8 @@ def actualizar_item_carrito(request, item_id):
         try:
             data = json.loads(request.body)
             nueva_cantidad = int(data.get('cantidad', 1))
+
+            print(f"🔄 Actualizando item {item_id} a cantidad {nueva_cantidad}")  # Debug
 
             # Obtener el item del carrito
             item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
@@ -435,15 +424,22 @@ def actualizar_item_carrito(request, item_id):
 
             carrito = item.carrito
 
+            # ✅ FORMATEAR CORRECTAMENTE
+            subtotal = int(item.subtotal())
+            total = int(carrito.total_precio())
+
+            print(f"✅ Item actualizado - Subtotal: {subtotal}, Total: {total}")  # Debug
+
             return JsonResponse({
                 'success': True,
                 'message': 'Cantidad actualizada correctamente',
-                'item_subtotal': float(item.subtotal()),
+                'item_subtotal': subtotal,
                 'carrito_items': carrito.total_items(),
-                'carrito_total': float(carrito.total_precio())
+                'carrito_total': total
             })
 
         except Exception as e:
+            print(f"❌ Error al actualizar item: {str(e)}")  # Debug
             return JsonResponse({
                 'success': False,
                 'message': f'Error: {str(e)}'
@@ -455,25 +451,43 @@ def actualizar_item_carrito(request, item_id):
 @login_required
 @csrf_exempt
 def eliminar_item_carrito(request, item_id):
-    """Eliminar un item del carrito vía AJAX"""
+    """Eliminar un item del carrito vía AJAX - ✅ CORREGIDO"""
     if request.method == 'DELETE':
         try:
+            print(f"🗑️ Intentando eliminar item {item_id}")  # Debug
+
             # Obtener el item del carrito
             item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
             producto_nombre = item.producto.nombre
             carrito = item.carrito
 
+            print(f"📦 Item encontrado: {producto_nombre}")  # Debug
+
             # Eliminar el item
             item.delete()
+
+            print(f"✅ Item eliminado exitosamente")  # Debug
+
+            # ✅ FORMATEAR CORRECTAMENTE
+            total = int(carrito.total_precio())
 
             return JsonResponse({
                 'success': True,
                 'message': f'{producto_nombre} eliminado del carrito',
                 'carrito_items': carrito.total_items(),
-                'carrito_total': float(carrito.total_precio())
+                'carrito_total': total
             })
 
+        except ItemCarrito.DoesNotExist:
+            print(f"❌ Item {item_id} no encontrado")  # Debug
+            return JsonResponse({
+                'success': False,
+                'message': 'El producto no existe en el carrito'
+            })
         except Exception as e:
+            print(f"❌ Error al eliminar item: {str(e)}")  # Debug
+            import traceback
+            traceback.print_exc()  # Mostrar traceback completo
             return JsonResponse({
                 'success': False,
                 'message': f'Error: {str(e)}'
@@ -495,7 +509,7 @@ def limpiar_carrito(request):
                 'success': True,
                 'message': 'Carrito limpiado correctamente',
                 'carrito_items': 0,
-                'carrito_total': 0.0
+                'carrito_total': 0
             })
 
         except Exception as e:
@@ -533,9 +547,9 @@ def carrito_items_ajax(request):
                 'id': item.id,
                 'producto_id': item.producto.id,
                 'nombre': item.producto.nombre,
-                'precio': float(item.producto.precio_actual()),
+                'precio': int(item.producto.precio_actual()),
                 'cantidad': item.cantidad,
-                'subtotal': float(item.subtotal()),
+                'subtotal': int(item.subtotal()),
                 'imagen_url': item.producto.imagen.url if item.producto.imagen else None,
                 'categoria': item.producto.categoria.nombre,
             })
@@ -544,7 +558,7 @@ def carrito_items_ajax(request):
             'success': True,
             'items': items_data,
             'total_items': carrito.total_items(),
-            'total_precio': float(carrito.total_precio()),
+            'total_precio': int(carrito.total_precio()),
             'items_count': items.count(),
             'has_more': False
         })
@@ -553,7 +567,7 @@ def carrito_items_ajax(request):
             'success': True,
             'items': [],
             'total_items': 0,
-            'total_precio': 0.0,
+            'total_precio': 0,
             'items_count': 0,
             'has_more': False
         })
@@ -733,7 +747,6 @@ def actualizar_perfil(request):
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
 
-
 @login_required
 @csrf_exempt
 def cambiar_password(request):
@@ -791,7 +804,7 @@ def cambiar_password(request):
             if errores:
                 return JsonResponse({
                     'success': False,
-                    'message': errores[0]  # Mostrar el primer error
+                    'message': errores[0]
                 })
 
             # Cambiar contraseña
@@ -814,6 +827,7 @@ def cambiar_password(request):
             })
 
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
+
 
 # ====================== RECUPERACIÓN DE CONTRASEÑA POR EMAIL ======================
 
