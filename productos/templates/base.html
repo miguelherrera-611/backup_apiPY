@@ -236,26 +236,85 @@
             box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
         }
 
-        /* Toggle de modo claro/oscuro */
+        /* ========================================= */
+        /* BOTONES NAVBAR - ESTILO UNIFORME GAMING */
+        /* ========================================= */
+
+        /* Toggle de modo claro/oscuro - REFERENCIA BASE */
         .theme-toggle {
-            background: var(--gaming-purple);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 8px 16px;
+            background: var(--gaming-purple) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 8px 16px !important;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-            font-weight: 600;
-            font-size: 14px;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .theme-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+            background: var(--gaming-purple) !important;
+            color: white !important;
+        }
+
+        /* Botón INICIAR SESIÓN - IGUAL al Modo Claro */
+        .navbar .btn-outline-primary {
+            background: var(--gaming-purple) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 8px 16px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+            transition: all 0.3s ease !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .btn-outline-primary:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+            background: var(--gaming-purple) !important;
+            color: white !important;
+        }
+
+        /* Botón CREAR CUENTA - IGUAL al Modo Claro */
+        .navbar .btn-primary {
+            background: var(--gaming-purple) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 8px 16px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+            transition: all 0.3s ease !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .btn-primary:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+            background: var(--gaming-purple) !important;
+            color: white !important;
+        }
+
+        /* Forzar color blanco en iconos y texto de los botones */
+        .navbar .btn-outline-primary *,
+        .navbar .btn-primary *,
+        .theme-toggle * {
+            color: white !important;
         }
 
         /* Carrito */
@@ -751,25 +810,6 @@
             color: inherit !important;
         }
 
-        /* ========================================= */
-        /* BOTONES NAVBAR - INICIAR SESIÓN MORADO */
-        /* ========================================= */
-
-        /* Botón Iniciar Sesión - MORADO en modo oscuro */
-        .navbar .btn-outline-primary {
-            background: transparent !important;
-            border: 2px solid var(--gaming-purple) !important;
-            color: var(--gaming-purple) !important;
-        }
-
-        .navbar .btn-outline-primary:hover {
-            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
-            border-color: var(--gaming-purple) !important;
-            color: #ffffff !important;
-            transform: scale(1.05) !important;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5) !important;
-        }
-
         /* ============== MODO CLARO ============== */
 
         body.light-mode {
@@ -1148,35 +1188,62 @@
         }
 
         /* ========================================= */
-        /* BOTONES NAVBAR EN MODO CLARO - CORREGIDO */
+        /* BOTONES NAVBAR EN MODO CLARO - UNIFORME */
         /* ========================================= */
 
-        /* Botón Iniciar Sesión - MORADO en modo claro */
+        /* Botón MODO CLARO - Mantener estilo en modo claro */
+        body.light-mode .theme-toggle {
+            background: var(--gaming-purple) !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        body.light-mode .theme-toggle:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+        }
+
+        /* Botón INICIAR SESIÓN - IGUAL en modo claro */
         body.light-mode .navbar .btn-outline-primary {
-            background: transparent !important;
-            border: 2px solid var(--gaming-purple) !important;
-            color: var(--gaming-purple) !important;
+            background: var(--gaming-purple) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 8px 16px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
         }
 
         body.light-mode .navbar .btn-outline-primary:hover {
-            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
-            border-color: var(--gaming-purple) !important;
-            color: #ffffff !important;
             transform: scale(1.05) !important;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+            background: var(--gaming-purple) !important;
+            color: white !important;
         }
 
-        /* Botón CREAR CUENTA - Sin cambio de texto en modo claro */
+        /* Botón CREAR CUENTA - IGUAL en modo claro */
         body.light-mode .navbar .btn-primary {
-            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
-            color: #ffffff !important;
+            background: var(--gaming-purple) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 8px 16px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
         }
 
         body.light-mode .navbar .btn-primary:hover {
-            background: linear-gradient(45deg, var(--gaming-purple-light), var(--gaming-neon)) !important;
-            color: #ffffff !important;
             transform: scale(1.05) !important;
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+            background: var(--gaming-purple) !important;
+            color: white !important;
+        }
+
+        /* Forzar color blanco en modo claro también */
+        body.light-mode .navbar .btn-outline-primary *,
+        body.light-mode .navbar .btn-primary *,
+        body.light-mode .theme-toggle * {
+            color: white !important;
         }
     </style>
 </head>

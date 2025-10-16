@@ -12,7 +12,7 @@
             <i class="fas fa-user-circle me-3"></i>
             Mi Perfil
         </h1>
-        <p class="text-white-50 mb-0">Gestiona tu información personal y preferencias</p>
+        <p class="text-white-50 mb-0"><strong>Gestiona tu información personal y preferencias</strong></p>
     </div>
     <div class="col-md-4">
         <div class="stats-card card p-3 text-center">
@@ -41,12 +41,12 @@
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="first_name" class="form-label">Nombre</label>
+                            <label for="first_name" class="form-label"><strong>Nombre</strong></label>
                             <input type="text" class="form-control" id="first_name" name="first_name" 
                                    value="{{ user.first_name|default:'' }}" readonly>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="last_name" class="form-label">Apellido</label>
+                            <label for="last_name" class="form-label"><strong>Apellido</strong></label>
                             <input type="text" class="form-control" id="last_name" name="last_name"
                                    value="{{ user.last_name|default:'' }}" readonly>
                         </div>
@@ -54,13 +54,13 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="username" class="form-label">Usuario</label>
+                            <label for="username" class="form-label"><strong>Usuario</strong></label>
                             <input type="text" class="form-control" id="username" name="username"
                                    value="{{ user.username }}" readonly>
-                            <small class="text-muted">El nombre de usuario no se puede cambiar</small>
+                            <small class="text-muted"><strong>El nombre de usuario no se puede cambiar</strong></small>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label"><strong>Email</strong></label>
                             <input type="email" class="form-control" id="email" name="email"
                                    value="{{ user.email|default:'' }}" readonly>
                         </div>
@@ -68,19 +68,19 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="telefono" class="form-label">Teléfono</label>
+                            <label for="telefono" class="form-label"><strong>Teléfono</strong></label>
                             <input type="tel" class="form-control" id="telefono" name="telefono"
                                    value="{{ perfil.telefono|default:'' }}" readonly>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                            <label for="fecha_nacimiento" class="form-label"><strong>Fecha de Nacimiento</strong></label>
                             <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento"
                                    value="{% if perfil.fecha_nacimiento %}{{ perfil.fecha_nacimiento|date:'Y-m-d' }}{% endif %}" readonly>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="direccion" class="form-label">Dirección</label>
+                        <label for="direccion" class="form-label"><strong>Dirección</strong></label>
                         <textarea class="form-control" id="direccion" name="direccion" rows="3" readonly>{{ perfil.direccion|default:'' }}</textarea>
                     </div>
 
@@ -89,7 +89,7 @@
                             <i class="fas fa-save me-1"></i>Guardar Cambios
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">
-                            <i class="fas fa-times me-1"></i>Cancelar
+                            <i class="fas fa-times me-1"></i><strong>Cancelar</strong>
                         </button>
                     </div>
                 </form>
@@ -108,7 +108,7 @@
                 <form id="passwordForm">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="current_password" class="form-label">Contraseña Actual</label>
+                        <label for="current_password" class="form-label"><strong>Contraseña Actual</strong></label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="current_password" name="current_password" required>
                             <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('current_password', 'currentIcon')">
@@ -118,18 +118,18 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="new_password1" class="form-label">Nueva Contraseña</label>
+                        <label for="new_password1" class="form-label"><strong>Nueva Contraseña</strong></label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="new_password1" name="new_password1" required>
                             <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('new_password1', 'newIcon1')">
                                 <i class="fas fa-eye" id="newIcon1"></i>
                             </button>
                         </div>
-                        <small class="text-muted">Mínimo 8 caracteres con letras y números</small>
+                        <small class="text-muted"><strong>Mínimo 8 caracteres con letras y números</strong></small>
                     </div>
 
                     <div class="mb-3">
-                        <label for="new_password2" class="form-label">Confirmar Nueva Contraseña</label>
+                        <label for="new_password2" class="form-label"><strong>Confirmar Nueva Contraseña</strong></label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="new_password2" name="new_password2" required>
                             <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('new_password2', 'newIcon2')">
@@ -139,7 +139,7 @@
                     </div>
 
                     <button type="button" class="btn btn-warning" onclick="cambiarPassword()">
-                        <i class="fas fa-key me-1"></i>Cambiar Contraseña
+                        <i class="fas fa-key me-1"></i><strong>Cambiar Contraseña</strong>
                     </button>
                 </form>
             </div>
