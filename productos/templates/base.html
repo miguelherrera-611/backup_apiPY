@@ -751,6 +751,25 @@
             color: inherit !important;
         }
 
+        /* ========================================= */
+        /* BOTONES NAVBAR - INICIAR SESIÓN MORADO */
+        /* ========================================= */
+
+        /* Botón Iniciar Sesión - MORADO en modo oscuro */
+        .navbar .btn-outline-primary {
+            background: transparent !important;
+            border: 2px solid var(--gaming-purple) !important;
+            color: var(--gaming-purple) !important;
+        }
+
+        .navbar .btn-outline-primary:hover {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+            border-color: var(--gaming-purple) !important;
+            color: #ffffff !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5) !important;
+        }
+
         /* ============== MODO CLARO ============== */
 
         body.light-mode {
@@ -1126,6 +1145,38 @@
         body.light-mode .gaming-carousel-title h2 {
             color: var(--gaming-purple) !important;
             text-shadow: none !important;
+        }
+
+        /* ========================================= */
+        /* BOTONES NAVBAR EN MODO CLARO - CORREGIDO */
+        /* ========================================= */
+
+        /* Botón Iniciar Sesión - MORADO en modo claro */
+        body.light-mode .navbar .btn-outline-primary {
+            background: transparent !important;
+            border: 2px solid var(--gaming-purple) !important;
+            color: var(--gaming-purple) !important;
+        }
+
+        body.light-mode .navbar .btn-outline-primary:hover {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+            border-color: var(--gaming-purple) !important;
+            color: #ffffff !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5) !important;
+        }
+
+        /* Botón CREAR CUENTA - Sin cambio de texto en modo claro */
+        body.light-mode .navbar .btn-primary {
+            background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+            color: #ffffff !important;
+        }
+
+        body.light-mode .navbar .btn-primary:hover {
+            background: linear-gradient(45deg, var(--gaming-purple-light), var(--gaming-neon)) !important;
+            color: #ffffff !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5) !important;
         }
     </style>
 </head>

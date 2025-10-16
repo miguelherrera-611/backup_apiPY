@@ -11,7 +11,7 @@
         Bienvenido a GAMERLY
     </h1>
     <p class="lead mb-4">
-        "Juega mejor. Vive Gamerly" - Descubre productos gaming increíbles con la mejor tecnología
+        <strong>"Juega mejor. Vive Gamerly" - Descubre productos gaming increíbles con la mejor tecnología</strong>
     </p>
     {% if not user.is_authenticated %}
         <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
@@ -300,7 +300,7 @@
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 900 !important;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
@@ -316,6 +316,7 @@
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
+            font-weight: 600 !important;
         }
 
         /* PRECIOS */
@@ -328,11 +329,12 @@
             text-decoration: line-through;
             font-size: 14px;
             margin-right: 10px;
+            font-weight: 700 !important;
         }
 
         .precio-actual {
             font-family: 'Orbitron', monospace;
-            font-weight: 700;
+            font-weight: 900 !important;
             font-size: 1.5rem;
             color: var(--gaming-success);
             text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
@@ -358,12 +360,14 @@
             border-top: 1px solid rgba(139, 92, 246, 0.3);
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
+            font-weight: 700 !important;
         }
 
         .stock-info, .fecha-info {
             display: flex;
             align-items: center;
             gap: 5px;
+            ont-weight: 700 !important;
         }
 
         /* CONTROLES DEL CARRUSEL */
