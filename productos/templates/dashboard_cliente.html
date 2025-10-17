@@ -5,6 +5,224 @@
 {% block content %}
 {% csrf_token %}
 
+<style>
+/* ===== ESTILOS PARA FILTROS GAMING ===== */
+.filtros-gaming-card {
+    background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.9));
+    border: 2px solid var(--gaming-purple);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+    backdrop-filter: blur(20px);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.filtros-titulo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gaming-neon);
+    text-shadow: 0 0 15px rgba(192, 132, 252, 0.6);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.filtros-titulo i {
+    font-size: 1.8rem;
+}
+
+.categoria-select-wrapper {
+    position: relative;
+}
+
+.categoria-select-label {
+    color: var(--gaming-neon);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.categoria-select {
+    background: linear-gradient(145deg, rgba(15, 15, 15, 0.95), rgba(26, 26, 26, 0.9)) !important;
+    border: 2px solid var(--gaming-purple) !important;
+    border-radius: 15px !important;
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    padding: 15px 20px !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b5cf6' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 20px center !important;
+    padding-right: 50px !important;
+}
+
+.categoria-select:hover {
+    border-color: var(--gaming-neon) !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
+    transform: translateY(-2px);
+}
+
+.categoria-select:focus {
+    outline: none !important;
+    border-color: var(--gaming-neon) !important;
+    box-shadow: 0 0 25px rgba(192, 132, 252, 0.7) !important;
+}
+
+.categoria-select option {
+    background: rgba(26, 26, 26, 0.98) !important;
+    color: white !important;
+    padding: 15px !important;
+    font-weight: 600 !important;
+}
+
+.categoria-select option:hover,
+.categoria-select option:checked {
+    background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+    color: white !important;
+}
+
+/* Indicador de categoría seleccionada */
+.categoria-actual {
+    background: rgba(139, 92, 246, 0.15);
+    border: 2px solid var(--gaming-neon);
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.categoria-actual-texto {
+    color: var(--gaming-neon);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.categoria-actual-nombre {
+    background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light));
+    color: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+/* Botones de acción gaming */
+.btn-filtrar {
+    background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+    border: 2px solid var(--gaming-purple) !important;
+    border-radius: 15px !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    padding: 15px 30px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+.btn-filtrar:hover {
+    transform: scale(1.05) translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.6) !important;
+    border-color: var(--gaming-neon) !important;
+}
+
+.btn-limpiar-filtros {
+    background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+    border: 2px solid var(--gaming-danger) !important;
+    border-radius: 15px !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    padding: 15px 30px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4) !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.btn-limpiar-filtros:hover {
+    transform: scale(1.05) translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(239, 68, 68, 0.6) !important;
+    background: linear-gradient(45deg, #dc2626, #b91c1c) !important;
+    color: white !important;
+}
+
+.botones-filtros {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* Modo claro */
+body.light-mode .filtros-gaming-card {
+    background: linear-gradient(145deg, #ffffff, rgba(248, 249, 250, 0.95));
+    border: 2px solid var(--gaming-purple);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .filtros-titulo {
+    color: var(--gaming-purple);
+    text-shadow: none;
+}
+
+body.light-mode .categoria-select-label {
+    color: var(--gaming-purple);
+}
+
+body.light-mode .categoria-select {
+    background: #ffffff !important;
+    border: 2px solid var(--gaming-purple) !important;
+    color: #212529 !important;
+}
+
+body.light-mode .categoria-select option {
+    background: #ffffff !important;
+    color: #212529 !important;
+}
+
+body.light-mode .categoria-actual {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+body.light-mode .categoria-actual-texto {
+    color: var(--gaming-purple);
+}
+</style>
+
 <!-- Header del Dashboard Cliente -->
 <div class="row mb-4">
     <div class="col-md-8">
@@ -12,58 +230,73 @@
             <i class="fas fa-shopping-bag me-3"></i>
             Catálogo de Productos
         </h1>
-        <p class="text-white-50 mb-0"> <strong> Descubre nuestros increíbles productos </strong> </p>
+        <p class="text-white-50 mb-0"><strong>Descubre nuestros increíbles productos</strong></p>
     </div>
     <div class="col-md-4">
         <div class="stats-card card p-3 text-center">
             <h4 class="mb-1">{{ productos.paginator.count }}</h4>
-            <small> <strong>Productos Disponibles</strong> </small>
+            <small><strong>Productos Disponibles</strong></small>
         </div>
     </div>
 </div>
 
-<!-- Filtros -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row align-items-center">
+<!-- Filtros Gaming Mejorados -->
+<div class="filtros-gaming-card">
+    <h5 class="filtros-titulo">
+        <i class="fas fa-sliders-h"></i>
+        Filtrar Productos
+    </h5>
+
+    <form method="get" id="filtroForm">
+        <div class="row align-items-end">
             <div class="col-md-8">
-                <h5 class="mb-3">
-                    <i class="fas fa-filter me-2"></i>Filtrar Productos
-                </h5>
-                <form method="get" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="categoria" class="form-label">Categoría</label>
-                        <select name="categoria" id="categoria" class="form-control" onchange="this.form.submit()">
-                            <option value="">Todas las categorías</option>
-                            {% for categoria in categorias %}
-                                <option value="{{ categoria.id }}">
-                                    {{ categoria.nombre }} ({{ categoria.productos.count }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-6 d-flex align-items-end">
-                        <div class="btn-group">
-                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-times me-1"></i>Limpiar Filtros
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search me-1"></i>Filtrar
-                            </button>
+                <div class="categoria-select-wrapper">
+                    <label for="categoria" class="categoria-select-label">
+                        <i class="fas fa-tags"></i>
+                        Selecciona una Categoría
+                    </label>
+                    <select name="categoria" id="categoria" class="categoria-select">
+                        <option value="">🎮 Todas las categorías</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
+                                {{ categoria.nombre }} ({{ categoria.productos.count }})
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Indicador de categoría actual -->
+                    {% if request.GET.categoria %}
+                        <div class="categoria-actual">
+                            <div class="categoria-actual-texto">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Filtrando por:</span>
+                                <span class="categoria-actual-nombre">
+                                    {% for categoria in categorias %}
+                                        {% if categoria.id|stringformat:"s" == request.GET.categoria %}
+                                            {{ categoria.nombre }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    {% endif %}
+                </div>
             </div>
+
             <div class="col-md-4">
-                <div class="text-center">
-                    <a href="{% url 'ver_carrito' %}" class="btn btn-outline-info">
-                        <i class="fas fa-shopping-cart me-2"></i>
-                        Ver Mi Carrito
+                <div class="botones-filtros">
+                    <a href="{% url 'dashboard' %}" class="btn-limpiar-filtros">
+                        <i class="fas fa-times-circle"></i>
+                        Limpiar
                     </a>
+                    <button type="submit" class="btn-filtrar">
+                        <i class="fas fa-search me-2"></i>
+                        Filtrar
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 
 <!-- Grid de Productos -->
@@ -203,7 +436,7 @@
                 <ul class="pagination pagination-lg">
                     {% if productos.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ productos.previous_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">
+                            <a class="page-link" href="?page={{ productos.previous_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
                         </li>
@@ -216,7 +449,7 @@
                             </li>
                         {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
                                     {{ num }}
                                 </a>
                             </li>
@@ -225,7 +458,7 @@
 
                     {% if productos.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ productos.next_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">
+                            <a class="page-link" href="?page={{ productos.next_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
                                 <i class="fas fa-chevron-right"></i>
                             </a>
                         </li>
@@ -241,7 +474,7 @@
         <div class="card p-5">
             <i class="fas fa-search fa-4x text-muted mb-4"></i>
             <h3 class="text-muted">No se encontraron productos</h3>
-            {% if categoria_seleccionada %}
+            {% if request.GET.categoria %}
                 <p class="text-muted mb-4">
                     No hay productos disponibles en la categoría seleccionada.
                 </p>
@@ -317,13 +550,9 @@ function agregarAlCarrito(productoId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Mostrar mensaje de éxito
             mostrarMensaje(data.message, 'success');
-
-            // Resetear cantidad
             document.getElementById('qty' + productoId).selectedIndex = 0;
 
-            // Actualizar contador del carrito
             var badge = document.getElementById('carritoBadge');
             if (badge) {
                 badge.textContent = data.carrito_items;

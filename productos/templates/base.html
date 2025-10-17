@@ -32,7 +32,6 @@
             overflow-x: hidden;
         }
 
-        /* Efectos de fondo gaming */
         body::before {
             content: '';
             position: fixed;
@@ -236,11 +235,6 @@
             box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
         }
 
-        /* ========================================= */
-        /* BOTONES NAVBAR - ESTILO UNIFORME GAMING */
-        /* ========================================= */
-
-        /* Toggle de modo claro/oscuro - REFERENCIA BASE */
         .theme-toggle {
             background: var(--gaming-purple) !important;
             color: white !important;
@@ -264,7 +258,6 @@
             color: white !important;
         }
 
-        /* Botón INICIAR SESIÓN - IGUAL al Modo Claro */
         .navbar .btn-outline-primary {
             background: var(--gaming-purple) !important;
             color: white !important;
@@ -287,7 +280,6 @@
             color: white !important;
         }
 
-        /* Botón CREAR CUENTA - IGUAL al Modo Claro */
         .navbar .btn-primary {
             background: var(--gaming-purple) !important;
             color: white !important;
@@ -310,14 +302,12 @@
             color: white !important;
         }
 
-        /* Forzar color blanco en iconos y texto de los botones */
         .navbar .btn-outline-primary *,
         .navbar .btn-primary *,
         .theme-toggle * {
             color: white !important;
         }
 
-        /* Carrito */
         .carrito-icon {
             position: relative;
             color: var(--gaming-neon);
@@ -617,7 +607,141 @@
             font-weight: 600;
         }
 
-        /* Dropdown menu */
+        /* ===== MODAL DE CONFIRMACIÓN PARA DROPDOWN CARRITO ===== */
+        .modal-confirmacion-dropdown {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-confirmacion-dropdown.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-confirmacion-dropdown-content {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.98), rgba(42, 42, 42, 0.95));
+            border: 2px solid var(--gaming-purple);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-confirmacion-dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-confirmacion-dropdown-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .modal-confirmacion-dropdown-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+
+        .modal-confirmacion-dropdown-body {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .modal-confirmacion-dropdown-producto {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 15px;
+            color: var(--gaming-neon);
+            font-weight: 600;
+        }
+
+        .modal-confirmacion-dropdown-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .modal-confirmacion-dropdown-btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-confirmacion-dropdown-btn-cancelar {
+            background: linear-gradient(45deg, #6b7280, #4b5563);
+            color: white;
+            border: 2px solid #6b7280;
+        }
+
+        .modal-confirmacion-dropdown-btn-cancelar:hover {
+            background: linear-gradient(45deg, #4b5563, #374151);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(107, 114, 128, 0.5);
+        }
+
+        .modal-confirmacion-dropdown-btn-confirmar {
+            background: linear-gradient(45deg, var(--gaming-danger), #dc2626);
+            color: white;
+            border: 2px solid var(--gaming-danger);
+        }
+
+        .modal-confirmacion-dropdown-btn-confirmar:hover {
+            background: linear-gradient(45deg, #dc2626, #b91c1c);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .dropdown-menu {
             background: linear-gradient(145deg, var(--gaming-dark), var(--gaming-gray));
             border: 2px solid var(--gaming-purple);
@@ -652,7 +776,6 @@
             margin: 8px 0;
         }
 
-        /* Formularios */
         .form-control {
             background: rgba(26, 26, 26, 0.8);
             border: 1px solid var(--gaming-purple);
@@ -671,7 +794,6 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
-        /* Alertas */
         .alert-success {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(26, 26, 26, 0.8));
             border: 1px solid var(--gaming-success);
@@ -684,7 +806,6 @@
             color: white;
         }
 
-        /* Badges */
         .badge {
             box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
         }
@@ -705,7 +826,6 @@
             background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
         }
 
-        /* Tabla */
         .table {
             color: white;
         }
@@ -715,7 +835,6 @@
             border-color: var(--gaming-purple);
         }
 
-        /* Paginación */
         .pagination .page-link {
             background: rgba(15, 15, 15, 0.9);
             border: 2px solid var(--gaming-purple);
@@ -737,7 +856,6 @@
             font-weight: 700;
         }
 
-        /* Títulos */
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Orbitron', monospace;
             text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
@@ -751,7 +869,6 @@
             color: var(--gaming-success) !important;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -769,7 +886,6 @@
             background: var(--gaming-neon);
         }
 
-        /* FORZAR BLANCO EN MODO OSCURO */
         * {
             color: #ffffff !important;
         }
@@ -919,13 +1035,10 @@
             background: rgba(139, 92, 246, 0.05) !important;
         }
 
-        /* ===== TEXTOS EN MODO CLARO ===== */
-
         body.light-mode * {
             color: #212529 !important;
         }
 
-        /* Excepciones blancas */
         body.light-mode .btn-primary,
         body.light-mode .btn-primary *,
         body.light-mode .btn-success,
@@ -955,7 +1068,6 @@
             color: #ffffff !important;
         }
 
-        /* Títulos púrpuras */
         body.light-mode h1,
         body.light-mode h2,
         body.light-mode h3,
@@ -1090,8 +1202,6 @@
             color: #ffffff !important;
         }
 
-        /* ===== CORRECCIÓN DASHBOARD ADMIN - TABLA EN MODO CLARO ===== */
-
         body.light-mode .table {
             background: #ffffff !important;
             color: #212529 !important;
@@ -1128,8 +1238,6 @@
         body.light-mode .table small {
             color: #6c757d !important;
         }
-
-        /* ===== CORRECCIÓN CARRUSEL HOME - MODO CLARO ===== */
 
         body.light-mode .producto-card {
             background: #ffffff !important;
@@ -1187,11 +1295,6 @@
             text-shadow: none !important;
         }
 
-        /* ========================================= */
-        /* BOTONES NAVBAR EN MODO CLARO - UNIFORME */
-        /* ========================================= */
-
-        /* Botón MODO CLARO - Mantener estilo en modo claro */
         body.light-mode .theme-toggle {
             background: var(--gaming-purple) !important;
             color: white !important;
@@ -1203,7 +1306,6 @@
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
         }
 
-        /* Botón INICIAR SESIÓN - IGUAL en modo claro */
         body.light-mode .navbar .btn-outline-primary {
             background: var(--gaming-purple) !important;
             color: white !important;
@@ -1221,7 +1323,6 @@
             color: white !important;
         }
 
-        /* Botón CREAR CUENTA - IGUAL en modo claro */
         body.light-mode .navbar .btn-primary {
             background: var(--gaming-purple) !important;
             color: white !important;
@@ -1239,11 +1340,31 @@
             color: white !important;
         }
 
-        /* Forzar color blanco en modo claro también */
         body.light-mode .navbar .btn-outline-primary *,
         body.light-mode .navbar .btn-primary *,
         body.light-mode .theme-toggle * {
             color: white !important;
+        }
+
+        /* ===== MODAL DE CONFIRMACIÓN EN MODO CLARO ===== */
+        body.light-mode .modal-confirmacion-dropdown-content {
+            background: #ffffff !important;
+            border: 2px solid var(--gaming-purple) !important;
+        }
+
+        body.light-mode .modal-confirmacion-dropdown-title {
+            color: var(--gaming-purple) !important;
+            text-shadow: none !important;
+        }
+
+        body.light-mode .modal-confirmacion-dropdown-body {
+            color: #212529 !important;
+        }
+
+        body.light-mode .modal-confirmacion-dropdown-producto {
+            background: rgba(139, 92, 246, 0.1) !important;
+            border: 1px solid rgba(139, 92, 246, 0.3) !important;
+            color: var(--gaming-purple) !important;
         }
     </style>
 </head>
@@ -1367,6 +1488,56 @@
         </div>
     </nav>
 
+    <!-- ✅ MODAL DE CONFIRMACIÓN PARA ELIMINAR ITEM DEL DROPDOWN -->
+    <div class="modal-confirmacion-dropdown" id="modalConfirmacionDropdown">
+        <div class="modal-confirmacion-dropdown-content">
+            <div class="modal-confirmacion-dropdown-header">
+                <div class="modal-confirmacion-dropdown-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="modal-confirmacion-dropdown-title">Confirmar Eliminación</h3>
+            </div>
+            <div class="modal-confirmacion-dropdown-body">
+                <p>¿Estás seguro de que deseas eliminar este producto del carrito?</p>
+                <div class="modal-confirmacion-dropdown-producto" id="modalDropdownProductoNombre"></div>
+            </div>
+            <div class="modal-confirmacion-dropdown-actions">
+                <button class="modal-confirmacion-dropdown-btn modal-confirmacion-dropdown-btn-cancelar" onclick="cerrarModalDropdown()">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button class="modal-confirmacion-dropdown-btn modal-confirmacion-dropdown-btn-confirmar" id="btnConfirmarEliminarDropdown">
+                    <i class="fas fa-trash me-2"></i>Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ MODAL DE CONFIRMACIÓN PARA LIMPIAR TODO EL CARRITO -->
+    <div class="modal-confirmacion-dropdown" id="modalLimpiarCarritoDropdown">
+        <div class="modal-confirmacion-dropdown-content">
+            <div class="modal-confirmacion-dropdown-header">
+                <div class="modal-confirmacion-dropdown-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="modal-confirmacion-dropdown-title">Vaciar Carrito</h3>
+            </div>
+            <div class="modal-confirmacion-dropdown-body">
+                <p>¿Estás seguro de que deseas vaciar todo el carrito?</p>
+                <div class="modal-confirmacion-dropdown-producto">
+                    <i class="fas fa-trash me-2"></i>Se eliminarán todos los productos
+                </div>
+            </div>
+            <div class="modal-confirmacion-dropdown-actions">
+                <button class="modal-confirmacion-dropdown-btn modal-confirmacion-dropdown-btn-cancelar" onclick="cerrarModalLimpiarCarrito()">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button class="modal-confirmacion-dropdown-btn modal-confirmacion-dropdown-btn-confirmar" onclick="confirmarLimpiarCarrito()">
+                    <i class="fas fa-trash me-2"></i>Vaciar Todo
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main style="margin-top: 100px;">
         <div class="container">
@@ -1441,7 +1612,14 @@
 
         document.addEventListener('click', function(event) {
             const container = document.getElementById('carritoContainer');
-            if (!container.contains(event.target) && carritoAbierto) {
+            const modalEliminar = document.getElementById('modalConfirmacionDropdown');
+            const modalLimpiar = document.getElementById('modalLimpiarCarritoDropdown');
+
+            // Solo cerrar dropdown si no se hizo clic en el container ni en ningún modal
+            if (!container.contains(event.target) &&
+                !modalEliminar.contains(event.target) &&
+                !modalLimpiar.contains(event.target) &&
+                carritoAbierto) {
                 document.getElementById('carritoDropdown').classList.remove('show');
                 carritoAbierto = false;
             }
@@ -1493,7 +1671,7 @@
                                                 <span class="carrito-item-quantity">x${item.cantidad}</span>
                                             </div>
                                         </div>
-                                        <button class="carrito-item-remove" onclick="eliminarItemCarrito(${item.id})" title="Eliminar">
+                                        <button class="carrito-item-remove" onclick="eliminarItemDropdown(${item.id}, '${item.nombre}')" title="Eliminar">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
@@ -1528,12 +1706,47 @@
                 });
         }
 
-        function eliminarItemCarrito(itemId) {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-            if (!csrfToken) {
-                console.error('CSRF token no encontrado');
+        // ✅ FUNCIÓN PARA ELIMINAR DESDE DROPDOWN CON MODAL
+        function eliminarItemDropdown(itemId, nombreProducto) {
+            mostrarModalDropdown(itemId, nombreProducto);
+        }
+
+        function mostrarModalDropdown(itemId, nombreProducto) {
+            const modal = document.getElementById('modalConfirmacionDropdown');
+            const productoNombreElement = document.getElementById('modalDropdownProductoNombre');
+            const btnConfirmar = document.getElementById('btnConfirmarEliminarDropdown');
+
+            productoNombreElement.innerHTML = `<i class="fas fa-box me-2"></i>${nombreProducto}`;
+            modal.classList.add('show');
+
+            btnConfirmar.onclick = function() {
+                confirmarEliminarDropdown(itemId, nombreProducto);
+            };
+        }
+
+        function cerrarModalDropdown() {
+            const modal = document.getElementById('modalConfirmacionDropdown');
+            modal.classList.remove('show');
+        }
+
+        function confirmarEliminarDropdown(itemId, nombreProducto) {
+            console.log('🗑️ Eliminando item desde dropdown:', itemId);
+
+            if (!itemId) {
+                console.error('❌ itemId es null o undefined');
+                mostrarMensaje('Error: ID de producto inválido', 'error');
+                cerrarModalDropdown();
                 return;
             }
+
+            const csrfToken = getCsrfToken();
+            if (!csrfToken) {
+                alert('Error: Token de seguridad no encontrado. Recarga la página.');
+                cerrarModalDropdown();
+                return;
+            }
+
+            cerrarModalDropdown();
 
             fetch(`/ajax/carrito/eliminar/${itemId}/`, {
                 method: 'DELETE',
@@ -1541,19 +1754,29 @@
                     'X-CSRFToken': csrfToken
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('📡 Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('📦 Response data:', data);
+
                 if (data.success) {
+                    // Actualizar badge del carrito
                     document.getElementById('carritoBadge').textContent = data.carrito_items;
+
+                    // Recargar items del dropdown
                     cargarCarritoItems();
-                    mostrarMensaje(data.message, 'success');
+
+                    // Mostrar mensaje de éxito
+                    mostrarMensaje(`✅ ${nombreProducto} eliminado del carrito`, 'success');
                 } else {
                     mostrarMensaje(data.message, 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                mostrarMensaje('Error al eliminar producto del carrito', 'error');
+                console.error('❌ Error al eliminar:', error);
+                mostrarMensaje('Error al eliminar producto', 'error');
             });
         }
 
@@ -1567,7 +1790,7 @@
         }
 
         function agregarAlCarrito(productoId, cantidad = 1) {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            const csrfToken = getCsrfToken();
             if (!csrfToken) {
                 console.error('CSRF token no encontrado');
                 return;
@@ -1604,35 +1827,51 @@
         }
 
         function limpiarCarrito() {
-            if (confirm('¿Estás seguro de que deseas limpiar el carrito?')) {
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-                if (!csrfToken) {
-                    console.error('CSRF token no encontrado');
-                    return;
-                }
+            // ✅ Mostrar modal en lugar de confirm()
+            mostrarModalLimpiarCarrito();
+        }
 
-                fetch('/ajax/carrito/limpiar/', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrfToken
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('carritoBadge').textContent = '0';
-                        document.getElementById('carritoTotal').textContent = '$0.00';
-                        cargarCarritoItems();
-                        mostrarMensaje(data.message, 'success');
-                    } else {
-                        mostrarMensaje(data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    mostrarMensaje('Error al limpiar carrito', 'error');
-                });
+        function mostrarModalLimpiarCarrito() {
+            const modal = document.getElementById('modalLimpiarCarritoDropdown');
+            modal.classList.add('show');
+        }
+
+        function cerrarModalLimpiarCarrito() {
+            const modal = document.getElementById('modalLimpiarCarritoDropdown');
+            modal.classList.remove('show');
+        }
+
+        function confirmarLimpiarCarrito() {
+            cerrarModalLimpiarCarrito();
+
+            const csrfToken = getCsrfToken();
+            if (!csrfToken) {
+                console.error('CSRF token no encontrado');
+                mostrarMensaje('Error: Token de seguridad no encontrado', 'error');
+                return;
             }
+
+            fetch('/ajax/carrito/limpiar/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('carritoBadge').textContent = '0';
+                    document.getElementById('carritoTotal').textContent = '$0.00';
+                    cargarCarritoItems();
+                    mostrarMensaje('✅ Carrito vaciado correctamente', 'success');
+                } else {
+                    mostrarMensaje(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarMensaje('Error al limpiar carrito', 'error');
+            });
         }
 
         function mostrarMensaje(mensaje, tipo) {
@@ -1654,8 +1893,54 @@
             }, 5000);
         }
 
+        function getCsrfToken() {
+            const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrfInput) {
+                return csrfInput.value;
+            }
+
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                    return value;
+                }
+            }
+
+            console.error('CSRF token no encontrado');
+            return null;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             cargarCarrito();
+
+            // Cerrar modales al hacer clic fuera
+            const modalEliminar = document.getElementById('modalConfirmacionDropdown');
+            const modalLimpiar = document.getElementById('modalLimpiarCarritoDropdown');
+
+            if (modalEliminar) {
+                modalEliminar.addEventListener('click', function(e) {
+                    if (e.target === modalEliminar) {
+                        cerrarModalDropdown();
+                    }
+                });
+            }
+
+            if (modalLimpiar) {
+                modalLimpiar.addEventListener('click', function(e) {
+                    if (e.target === modalLimpiar) {
+                        cerrarModalLimpiarCarrito();
+                    }
+                });
+            }
+
+            // Cerrar modales con tecla ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cerrarModalDropdown();
+                    cerrarModalLimpiarCarrito();
+                }
+            });
         });
     </script>
     {% endif %}
