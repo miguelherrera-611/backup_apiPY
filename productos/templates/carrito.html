@@ -178,7 +178,7 @@ input[type="number"].qty-input:focus {
     border-color: var(--gaming-neon) !important;
 }
 
-/* Botones de cantidad cuadrados */
+/* ===== FIX 4: BOTONES DE CANTIDAD EN MODO CLARO ===== */
 .btn-qty {
     width: 35px !important;
     height: 35px !important;
@@ -224,6 +224,105 @@ input[type="number"].qty-input:focus {
 .processing {
     opacity: 0.6;
     pointer-events: none;
+}
+
+/* ===== FIX 4: BOTONES ELIMINAR SIEMPRE ROJOS ===== */
+.btn-outline-danger {
+    background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+    border: 2px solid var(--gaming-danger) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-outline-danger:hover {
+    background: linear-gradient(45deg, #dc2626, #b91c1c) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.7) !important;
+    color: white !important;
+}
+
+.btn-outline-danger i {
+    color: white !important;
+}
+
+/* ===== MODO CLARO - CORRECCIONES ===== */
+body.light-mode input[type="number"].qty-input {
+    background: #ffffff !important;
+    color: #212529 !important;
+    border: 2px solid var(--gaming-purple) !important;
+}
+
+body.light-mode .btn-qty {
+    background: #ffffff !important;
+    color: var(--gaming-purple) !important;
+    border: 2px solid var(--gaming-purple) !important;
+}
+
+body.light-mode .btn-qty:hover:not(:disabled) {
+    background: var(--gaming-purple) !important;
+    color: white !important;
+}
+
+/* ===== FIX 4: TEXTO EN MODO CLARO - PRODUCTOS DEL CARRITO ===== */
+body.light-mode .card-header h5 {
+    color: #212529 !important;
+    font-weight: 900 !important;
+}
+
+body.light-mode .card-body h6,
+body.light-mode .card-body p,
+body.light-mode .card-body small,
+body.light-mode .card-body span,
+body.light-mode .card-body div {
+    color: #212529 !important;
+}
+
+body.light-mode .text-muted {
+    color: #6c757d !important;
+}
+
+/* ===== FIX NUEVA: PRECIOS EN NEGRO EN MODO CLARO ===== */
+body.light-mode .text-primary {
+    color: #212529 !important;
+    font-weight: 900 !important;
+}
+
+body.light-mode .text-success {
+    color: #212529 !important;
+    font-weight: 900 !important;
+}
+
+/* ===== FIX NUEVA: TÍTULOS Y DESCRIPCIONES EN NEGRILLA ===== */
+body.light-mode .card-body h6 {
+    font-weight: 900 !important;
+    color: #212529 !important;
+}
+
+body.light-mode .card-body p.text-muted {
+    font-weight: 700 !important;
+    color: #6c757d !important;
+}
+
+body.light-mode .card-body small.text-muted {
+    font-weight: 700 !important;
+    color: #6c757d !important;
+}
+
+/* ===== FIX 4: BOTONES ELIMINAR EN MODO CLARO - SIEMPRE ROJOS ===== */
+body.light-mode .btn-outline-danger {
+    background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+    border: 2px solid var(--gaming-danger) !important;
+    color: white !important;
+}
+
+body.light-mode .btn-outline-danger:hover {
+    background: linear-gradient(45deg, #dc2626, #b91c1c) !important;
+    color: white !important;
+}
+
+body.light-mode .btn-outline-danger i {
+    color: white !important;
 }
 </style>
 
@@ -315,7 +414,7 @@ input[type="number"].qty-input:focus {
                                     </strong>
                                 </div>
 
-                                <!-- Cantidad - ✅ VERSIÓN MEJORADA -->
+                                <!-- Cantidad -->
                                 <div class="col-md-2">
                                     <div class="d-flex align-items-center justify-content-center gap-2">
                                         <!-- Botón Disminuir -->
@@ -425,21 +524,17 @@ input[type="number"].qty-input:focus {
 <script>
 // ===== FUNCIÓN PRINCIPAL: CAMBIAR CANTIDAD =====
 function cambiarCantidad(itemId, nuevaCantidad) {
-    // ✅ Convertir a número entero
     nuevaCantidad = parseInt(nuevaCantidad);
 
-    // ✅ Obtener el input
     const input = document.getElementById(`qty-${itemId}`);
     if (!input) {
         console.error('Input no encontrado:', itemId);
         return;
     }
 
-    // ✅ Obtener límites
     const min = parseInt(input.getAttribute('min')) || 1;
     const max = parseInt(input.getAttribute('max')) || 999;
 
-    // ✅ Validación robusta
     if (isNaN(nuevaCantidad)) {
         alert('Por favor ingresa un número válido');
         input.value = input.getAttribute('data-default') || min;
@@ -458,14 +553,12 @@ function cambiarCantidad(itemId, nuevaCantidad) {
         return;
     }
 
-    // ✅ Obtener CSRF token
     const csrfToken = getCsrfToken();
     if (!csrfToken) {
         alert('Error: Token de seguridad no encontrado. Recarga la página.');
         return;
     }
 
-    // ✅ Deshabilitar controles mientras se procesa
     const itemElement = document.getElementById(`item-${itemId}`);
     if (itemElement) {
         itemElement.classList.add('processing');
@@ -474,7 +567,6 @@ function cambiarCantidad(itemId, nuevaCantidad) {
     const botones = itemElement.querySelectorAll('button');
     botones.forEach(btn => btn.disabled = true);
 
-    // ✅ Enviar petición AJAX
     fetch(`/ajax/carrito/actualizar/${itemId}/`, {
         method: 'POST',
         headers: {
@@ -488,37 +580,26 @@ function cambiarCantidad(itemId, nuevaCantidad) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // ✅ Actualizar input
             input.value = nuevaCantidad;
             input.setAttribute('data-default', nuevaCantidad);
 
-            // ✅ Actualizar subtotal
             const subtotalElem = document.getElementById(`subtotal-${itemId}`);
             if (subtotalElem) {
-                subtotalElem.textContent = `$${data.item_subtotal}`;
+                subtotalElem.textContent = `${data.item_subtotal}`;
             }
 
-            // ✅ Actualizar totales
             actualizarTotales(data.carrito_items, data.carrito_total);
-
-            // ✅ NO mostrar mensaje - actualización silenciosa
-            // mostrarMensaje(data.message, 'success');
         } else {
-            // ✅ Restaurar valor anterior en caso de error
             input.value = input.getAttribute('data-default') || min;
             mostrarMensaje(data.message, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-
-        // ✅ Restaurar valor anterior
         input.value = input.getAttribute('data-default') || min;
-
         mostrarMensaje('Error al actualizar cantidad', 'error');
     })
     .finally(() => {
-        // ✅ Re-habilitar controles
         if (itemElement) {
             itemElement.classList.remove('processing');
         }
@@ -528,12 +609,10 @@ function cambiarCantidad(itemId, nuevaCantidad) {
 
 // ===== FUNCIÓN: ELIMINAR ITEM =====
 function eliminarItem(itemId) {
-    // Obtener nombre del producto
     const itemElement = document.getElementById(`item-${itemId}`);
     const nombreElement = itemElement ? itemElement.querySelector('h6') : null;
     const nombreProducto = nombreElement ? nombreElement.textContent : 'este producto';
 
-    // Mostrar modal personalizado
     mostrarModalConfirmacion(itemId, nombreProducto);
 }
 
@@ -542,13 +621,10 @@ function mostrarModalConfirmacion(itemId, nombreProducto) {
     const productoNombreElement = document.getElementById('modalProductoNombre');
     const btnConfirmar = document.getElementById('btnConfirmarEliminar');
 
-    // Actualizar nombre del producto
     productoNombreElement.innerHTML = `<i class="fas fa-box me-2"></i>${nombreProducto}`;
 
-    // Mostrar modal
     modal.classList.add('show');
 
-    // ✅ Configurar botón de confirmar con el itemId correcto
     btnConfirmar.onclick = function() {
         confirmarEliminarItem(itemId, nombreProducto);
     };
@@ -560,7 +636,7 @@ function cerrarModalConfirmacion() {
 }
 
 function confirmarEliminarItem(itemId, nombreProducto) {
-    console.log('🗑️ Eliminando item:', itemId); // Debug
+    console.log('🗑️ Eliminando item:', itemId);
 
     if (!itemId) {
         console.error('❌ itemId es null o undefined');
@@ -576,7 +652,6 @@ function confirmarEliminarItem(itemId, nombreProducto) {
         return;
     }
 
-    // Cerrar modal
     cerrarModalConfirmacion();
 
     fetch(`/ajax/carrito/eliminar/${itemId}/`, {
@@ -586,14 +661,13 @@ function confirmarEliminarItem(itemId, nombreProducto) {
         }
     })
     .then(response => {
-        console.log('📡 Response status:', response.status); // Debug
+        console.log('📡 Response status:', response.status);
         return response.json();
     })
     .then(data => {
-        console.log('📦 Response data:', data); // Debug
+        console.log('📦 Response data:', data);
 
         if (data.success) {
-            // Eliminar el elemento del DOM con animación
             const itemElement = document.getElementById(`item-${itemId}`);
             if (itemElement) {
                 itemElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
@@ -602,17 +676,14 @@ function confirmarEliminarItem(itemId, nombreProducto) {
                 setTimeout(() => {
                     itemElement.remove();
 
-                    // Si el carrito está vacío, recargar la página
                     if (data.carrito_items === 0) {
                         location.reload();
                     }
                 }, 300);
             }
 
-            // Actualizar totales
             actualizarTotales(data.carrito_items, data.carrito_total);
 
-            // Mostrar mensaje de éxito
             mostrarMensaje(`${nombreProducto} eliminado del carrito`, 'success');
         } else {
             mostrarMensaje(data.message, 'error');
@@ -630,7 +701,6 @@ function limpiarTodoCarrito() {
 }
 
 function mostrarModalConfirmacionLimpiar() {
-    // Crear modal temporal para limpiar carrito
     const modalHTML = `
         <div class="modal-confirmacion show" id="modalLimpiarCarrito">
             <div class="modal-confirmacion-content">
@@ -658,7 +728,6 @@ function mostrarModalConfirmacionLimpiar() {
         </div>
     `;
 
-    // Insertar modal en el body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -688,7 +757,6 @@ function confirmarLimpiarCarrito() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Recargar la página para mostrar el carrito vacío
             location.reload();
         } else {
             mostrarMensaje(data.message, 'error');
@@ -702,22 +770,19 @@ function confirmarLimpiarCarrito() {
 
 // ===== FUNCIÓN: ACTUALIZAR TOTALES =====
 function actualizarTotales(totalItems, totalPrecio) {
-    // Actualizar badge del carrito en la navbar
     const badge = document.getElementById('carritoBadge');
     if (badge) {
         badge.textContent = totalItems;
     }
 
-    // Actualizar total en el header
     const headerTotal = document.getElementById('totalItemsHeader');
     if (headerTotal) {
         headerTotal.textContent = totalItems;
     }
 
-    // Actualizar total en el resumen
     const resumenTotal = document.getElementById('carritoTotalResumen');
     if (resumenTotal) {
-        resumenTotal.textContent = `$${totalPrecio}`;
+        resumenTotal.textContent = `${totalPrecio}`;
     }
 }
 
@@ -739,7 +804,6 @@ function mostrarMensaje(mensaje, tipo) {
     const main = document.querySelector('main .container');
     main.insertBefore(alertDiv, main.firstChild);
 
-    // Auto-cerrar después de 5 segundos
     setTimeout(() => {
         if (alertDiv.parentNode) {
             alertDiv.classList.remove('show');
@@ -755,7 +819,6 @@ function getCsrfToken() {
         return csrfInput.value;
     }
 
-    // Alternativo: buscar en cookies
     const cookies = document.cookie.split(';');
     for (let cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
@@ -770,7 +833,6 @@ function getCsrfToken() {
 
 // ===== INICIALIZACIÓN AL CARGAR LA PÁGINA =====
 document.addEventListener('DOMContentLoaded', function() {
-    // ✅ Verificar CSRF token
     const csrfToken = getCsrfToken();
     if (!csrfToken) {
         console.error('⚠️ CSRF token no encontrado al cargar la página');
@@ -778,20 +840,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ CSRF token encontrado correctamente');
     }
 
-    // ✅ Guardar valores por defecto de los inputs
     const inputs = document.querySelectorAll('input[type="number"]');
     inputs.forEach(input => {
         input.setAttribute('data-default', input.value);
     });
 
-    // ✅ Prevenir scroll con rueda del mouse en inputs number
     inputs.forEach(input => {
         input.addEventListener('wheel', function(e) {
             e.preventDefault();
         });
     });
 
-    // ✅ Cerrar modal al hacer clic fuera
     const modal = document.getElementById('modalConfirmacion');
     if (modal) {
         modal.addEventListener('click', function(e) {
@@ -801,7 +860,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ✅ Cerrar modal con tecla ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             cerrarModalConfirmacion();

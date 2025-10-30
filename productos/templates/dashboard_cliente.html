@@ -153,6 +153,7 @@
     transform: scale(1.05) translateY(-2px) !important;
     box-shadow: 0 8px 30px rgba(139, 92, 246, 0.6) !important;
     border-color: var(--gaming-neon) !important;
+    color: white !important;
 }
 
 .btn-limpiar-filtros {
@@ -187,6 +188,28 @@
     margin-top: 20px;
 }
 
+/* ===== FIX 3: BOTÓN OJO ESTILO MODO CLARO ===== */
+.btn-outline-primary.btn-sm {
+    background: var(--gaming-purple) !important;
+    border: 2px solid var(--gaming-purple) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+}
+
+.btn-outline-primary.btn-sm:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
+    background: var(--gaming-purple) !important;
+    border-color: var(--gaming-neon) !important;
+    color: white !important;
+}
+
+.btn-outline-primary.btn-sm i {
+    color: white !important;
+}
+
 /* Modo claro */
 body.light-mode .filtros-gaming-card {
     background: linear-gradient(145deg, #ffffff, rgba(248, 249, 250, 0.95));
@@ -203,6 +226,7 @@ body.light-mode .categoria-select-label {
     color: var(--gaming-purple);
 }
 
+/* ===== FIX 1: SELECT EN MODO CLARO - TEXTO NEGRO ===== */
 body.light-mode .categoria-select {
     background: #ffffff !important;
     border: 2px solid var(--gaming-purple) !important;
@@ -220,6 +244,41 @@ body.light-mode .categoria-actual {
 
 body.light-mode .categoria-actual-texto {
     color: var(--gaming-purple);
+}
+
+/* ===== FIX 2: BOTONES CON LETRA BLANCA EN MODO CLARO ===== */
+body.light-mode .btn-filtrar {
+    background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-purple-light)) !important;
+    color: white !important;
+}
+
+body.light-mode .btn-filtrar:hover {
+    color: white !important;
+}
+
+body.light-mode .btn-limpiar-filtros {
+    background: linear-gradient(45deg, var(--gaming-danger), #dc2626) !important;
+    color: white !important;
+}
+
+body.light-mode .btn-limpiar-filtros:hover {
+    color: white !important;
+}
+
+/* ===== FIX 3: BOTÓN OJO EN MODO CLARO ===== */
+body.light-mode .btn-outline-primary.btn-sm {
+    background: var(--gaming-purple) !important;
+    border: 2px solid var(--gaming-purple) !important;
+    color: white !important;
+}
+
+body.light-mode .btn-outline-primary.btn-sm:hover {
+    background: var(--gaming-purple) !important;
+    color: white !important;
+}
+
+body.light-mode .btn-outline-primary.btn-sm i {
+    color: white !important;
 }
 </style>
 
