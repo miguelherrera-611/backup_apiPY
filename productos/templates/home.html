@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block title %}Inicio - GAMERLY{% endblock %}
@@ -65,6 +64,7 @@
             text-align: center;
             margin-bottom: 50px;
             position: relative;
+            padding: 40px 0;
         }
 
         .gaming-carousel-title h2 {
@@ -78,23 +78,118 @@
                 0 0 60px var(--gaming-purple);
             margin-bottom: 20px;
             animation: titleGlow 3s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 10;
         }
 
+        /* EFECTO GAMER 1: Hexágonos flotantes animados */
         .gaming-carousel-title::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 150px;
-            height: 150px;
-            background: conic-gradient(from 0deg, transparent, var(--gaming-neon), transparent);
-            border-radius: 50%;
-            opacity: 0.2;
-            animation: rotate 8s linear infinite;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(30deg, transparent 40%, rgba(139, 92, 246, 0.1) 40%, rgba(139, 92, 246, 0.1) 60%, transparent 60%),
+                linear-gradient(150deg, transparent 40%, rgba(192, 132, 252, 0.1) 40%, rgba(192, 132, 252, 0.1) 60%, transparent 60%);
+            background-size: 80px 140px;
+            background-position: 0 0, 40px 70px;
+            animation: hexagonMove 20s linear infinite;
+            opacity: 0.5;
             z-index: -1;
         }
 
+        /* EFECTO GAMER 2: Líneas de velocidad */
+        .gaming-carousel-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--gaming-purple) 20%, 
+                var(--gaming-neon) 50%, 
+                var(--gaming-purple) 80%, 
+                transparent 100%);
+            animation: speedLines 3s ease-in-out infinite;
+            box-shadow: 0 0 20px var(--gaming-neon);
+            z-index: -1;
+        }
+
+        /* EFECTO GAMER 3: Partículas flotantes */
+        .gaming-carousel-title .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gaming-neon);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatParticle 6s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--gaming-neon);
+        }
+
+        .gaming-carousel-title .particle:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .gaming-carousel-title .particle:nth-child(2) {
+            top: 40%;
+            left: 20%;
+            animation-delay: 1s;
+        }
+
+        .gaming-carousel-title .particle:nth-child(3) {
+            top: 60%;
+            left: 80%;
+            animation-delay: 2s;
+        }
+
+        .gaming-carousel-title .particle:nth-child(4) {
+            top: 30%;
+            right: 15%;
+            animation-delay: 1.5s;
+        }
+
+        .gaming-carousel-title .particle:nth-child(5) {
+            top: 70%;
+            right: 25%;
+            animation-delay: 3s;
+        }
+
+        .gaming-carousel-title .particle:nth-child(6) {
+            top: 50%;
+            left: 50%;
+            animation-delay: 2.5s;
+        }
+
+        /* EFECTO GAMER 4: Pulsos radiales */
+        .gaming-carousel-title .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            margin: -150px 0 0 -150px;
+            border: 2px solid var(--gaming-purple);
+            border-radius: 50%;
+            opacity: 0;
+            animation: pulseRing 4s ease-out infinite;
+        }
+
+        .gaming-carousel-title .pulse-ring:nth-child(8) {
+            animation-delay: 1s;
+        }
+
+        .gaming-carousel-title .pulse-ring:nth-child(9) {
+            animation-delay: 2s;
+        }
+
+        /* ANIMACIONES GAMER */
         @keyframes titleGlow {
             from {
                 text-shadow:
@@ -109,9 +204,52 @@
             }
         }
 
-        @keyframes rotate {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        @keyframes hexagonMove {
+            0% {
+                background-position: 0 0, 40px 70px;
+            }
+            100% {
+                background-position: 80px 140px, 120px 210px;
+            }
+        }
+
+        @keyframes speedLines {
+            0%, 100% {
+                transform: scaleX(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes floatParticle {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(0) scale(1);
+            }
+            25% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-80px) scale(1.5);
+            }
+            75% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes pulseRing {
+            0% {
+                opacity: 0.6;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
         }
 
         /* CARRUSEL WRAPPER */
@@ -367,7 +505,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            ont-weight: 700 !important;
+            font-weight: 700 !important;
         }
 
         /* CONTROLES DEL CARRUSEL */
@@ -496,8 +634,21 @@
         }
     </style>
 
-    <!-- Título del carrusel -->
+    <!-- Título del carrusel con efectos gamer -->
     <div class="gaming-carousel-title">
+        <!-- Partículas flotantes -->
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        
+        <!-- Anillos de pulso -->
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        
         <h2>
             <i class="fas fa-fire me-3"></i>
             Productos Destacados
@@ -639,7 +790,7 @@ class GamingCarousel {
         this.indicators = document.getElementById('carouselIndicators');
         this.autoplayProgress = document.getElementById('autoplayProgress');
 
-        if (!this.track) return; // No hay carrusel si no hay productos
+        if (!this.track) return;
 
         this.cards = Array.from(this.track.children);
         this.currentIndex = 0;
@@ -647,7 +798,7 @@ class GamingCarousel {
         this.maxIndex = Math.max(0, this.cards.length - this.cardsToShow);
 
         this.autoplayInterval = null;
-        this.autoplayDuration = 5000; // 5 segundos
+        this.autoplayDuration = 5000;
         this.progressInterval = null;
 
         this.isAnimating = false;
@@ -662,7 +813,6 @@ class GamingCarousel {
         this.updateCarousel();
         this.startAutoplay();
 
-        // Responsive
         window.addEventListener('resize', () => {
             this.cardsToShow = this.getCardsToShow();
             this.maxIndex = Math.max(0, this.cards.length - this.cardsToShow);
@@ -674,8 +824,8 @@ class GamingCarousel {
 
     getCardsToShow() {
         const containerWidth = this.track.parentElement.offsetWidth;
-        const cardWidth = 320 + 30; // ancho de card + gap
-        return Math.floor((containerWidth - 60) / cardWidth); // 60px para padding
+        const cardWidth = 320 + 30;
+        return Math.floor((containerWidth - 60) / cardWidth);
     }
 
     setupIndicators() {
@@ -696,7 +846,6 @@ class GamingCarousel {
         this.prevBtn.addEventListener('click', () => this.prevSlide());
         this.nextBtn.addEventListener('click', () => this.nextSlide());
 
-        // Pausar autoplay en hover
         const carousel = document.querySelector('.carousel-wrapper');
         carousel.addEventListener('mouseenter', () => {
             this.isHovered = true;
@@ -708,7 +857,6 @@ class GamingCarousel {
             this.startAutoplay();
         });
 
-        // Touch/swipe support
         let startX = 0;
         let currentX = 0;
         let isDragging = false;
@@ -744,7 +892,6 @@ class GamingCarousel {
             }
         });
 
-        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') {
                 this.prevSlide();
@@ -759,14 +906,13 @@ class GamingCarousel {
 
         this.isAnimating = true;
 
-        const cardWidth = 320 + 30; // card width + gap
+        const cardWidth = 320 + 30;
         const translateX = -this.currentIndex * cardWidth;
 
         this.track.style.transform = `translateX(${translateX}px)`;
         this.updateIndicators();
         this.updateButtons();
 
-        // Animation complete
         setTimeout(() => {
             this.isAnimating = false;
         }, 800);
@@ -790,7 +936,7 @@ class GamingCarousel {
         if (this.currentIndex < this.maxIndex) {
             this.currentIndex++;
         } else {
-            this.currentIndex = 0; // Loop back to start
+            this.currentIndex = 0;
         }
 
         this.updateCarousel();
@@ -803,7 +949,7 @@ class GamingCarousel {
         if (this.currentIndex > 0) {
             this.currentIndex--;
         } else {
-            this.currentIndex = this.maxIndex; // Loop to end
+            this.currentIndex = this.maxIndex;
         }
 
         this.updateCarousel();
@@ -865,26 +1011,19 @@ class GamingCarousel {
     }
 }
 
-// Initialize carousel when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Solo inicializar si existe el carrusel
     if (document.getElementById('carouselTrack')) {
         new GamingCarousel();
-
-        // Gaming effects
         addGamingEffects();
     }
 });
 
 function addGamingEffects() {
-    // Add hover effects to cards
     const cards = document.querySelectorAll('.producto-card');
 
     cards.forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.zIndex = '10';
-
-            // Add glow effect
             this.style.filter = 'drop-shadow(0 0 20px rgba(192, 132, 252, 0.6))';
         });
 
@@ -893,15 +1032,13 @@ function addGamingEffects() {
             this.style.filter = '';
         });
 
-        // Click effect
         card.addEventListener('click', function() {
             this.style.animation = 'none';
-            this.offsetHeight; // trigger reflow
+            this.offsetHeight;
             this.style.animation = 'cardClick 0.3s ease';
         });
     });
 
-    // Add click animation
     const style = document.createElement('style');
     style.textContent = `
         @keyframes cardClick {
